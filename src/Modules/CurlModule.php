@@ -10,7 +10,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Curl\CurlItem;
 use Gzhegow\Lib\Modules\Curl\CurlProcess;
-use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 use Gzhegow\Lib\Modules\Curl\Event\AbstractOnCurlEvent;
 
 
@@ -77,8 +77,8 @@ class CurlModule
     public function __initialize()
     {
         if ( ! extension_loaded('curl') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: curl' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: curl' ]
             );
         }
 

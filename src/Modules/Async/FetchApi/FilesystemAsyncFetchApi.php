@@ -8,7 +8,7 @@ namespace Gzhegow\Lib\Modules\Async\FetchApi;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class FilesystemAsyncFetchApi implements AsyncFetchApiInterface
@@ -63,8 +63,8 @@ class FilesystemAsyncFetchApi implements AsyncFetchApiInterface
         $theType = Lib::type();
 
         if ( ! extension_loaded('curl') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: curl' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: curl' ]
             );
         }
 

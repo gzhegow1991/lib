@@ -13,6 +13,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Str\Slugger\DefaultSlugger;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 use Gzhegow\Lib\Modules\Str\Inflector\DefaultInflector;
 use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
 use Gzhegow\Lib\Modules\Str\Interpolator\DefaultInterpolator;
@@ -44,8 +45,8 @@ class StrModule
 
                 if ( $mbstringBool ) {
                     if ( ! extension_loaded('mbstring') ) {
-                        throw new RuntimeException(
-                            [ 'The extension missing: mbstring' ]
+                        throw new ExtensionException(
+                            [ 'The extension is missing: mbstring' ]
                         );
                     }
                 }
@@ -3460,8 +3461,8 @@ class StrModule
     public function utf8_encode(string $string, ?string $encoding = null) : ?string
     {
         if ( ! extension_loaded('iconv') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: iconv' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: iconv' ]
             );
         }
 

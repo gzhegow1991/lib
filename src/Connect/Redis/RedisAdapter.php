@@ -10,6 +10,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\RemoteException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class RedisAdapter
@@ -83,8 +84,8 @@ class RedisAdapter
     private function __construct()
     {
         if ( ! extension_loaded('redis') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: redis' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: redis' ]
             );
         }
     }

@@ -13,6 +13,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\ComposerException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 use Gzhegow\Lib\Modules\Str\Slugger\Preset\DefaultSluggerPreset;
 use Gzhegow\Lib\Modules\Str\Slugger\Preset\SluggerPresetInterface;
 use Gzhegow\Lib\Modules\Str\Slugger\PresetRegistry\SluggerPresetRegistry;
@@ -59,8 +60,8 @@ class DefaultSlugger implements SluggerInterface
     )
     {
         if ( ! extension_loaded('mbstring') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: mbstring' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: mbstring' ]
             );
         }
 
@@ -214,12 +215,8 @@ class DefaultSlugger implements SluggerInterface
 
         if ( $useIntlTransliterator ) {
             if ( ! $extensionAndFunctionExists ) {
-                throw new ComposerException(
-                    [
-                        ''
-                        . 'Missing php extension or function does not exist: '
-                        . '[ ' . implode(' ][ ', [ 'ext-intl', 'transliterator_transliterate' ]) . ' ]',
-                    ]
+                throw new ExtensionException(
+                    [ 'The extension is missing: intl' ]
                 );
             }
         }
@@ -457,12 +454,8 @@ class DefaultSlugger implements SluggerInterface
                 && function_exists('transliterator_transliterate');
 
             if ( ! $canUseIntl ) {
-                throw new ComposerException(
-                    [
-                        'Symfony Transliterator works incorectly without `ext-intl` if used on UTF-8 strings',
-                        //
-                        $string,
-                    ]
+                throw new ExtensionException(
+                    [ 'Symfony Transliterator works incorectly without `ext-intl` if used on UTF-8 strings', $string ]
                 );
             }
         }

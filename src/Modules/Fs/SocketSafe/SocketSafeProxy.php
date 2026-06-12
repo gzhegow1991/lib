@@ -9,6 +9,7 @@ namespace Gzhegow\Lib\Modules\Fs\SocketSafe;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 /**
@@ -28,8 +29,8 @@ class SocketSafeProxy
     public function __construct(SocketSafe $inner)
     {
         if ( ! extension_loaded('sockets') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: sockets' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: sockets' ]
             );
         }
 

@@ -8,6 +8,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Http\HttpHeader\HttpHeader;
 use Gzhegow\Lib\Modules\Http\Cookies\DefaultCookies;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 use Gzhegow\Lib\Modules\Http\Cookies\CookiesInterface;
 use Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafe;
 use Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafeProxy;
@@ -646,8 +647,8 @@ class HttpModule
     public function idn_to_ascii(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
     {
         if ( ! extension_loaded('intl') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: intl' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: intl' ]
             );
         }
 
@@ -671,8 +672,8 @@ class HttpModule
     public function idn_to_utf8(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
     {
         if ( ! extension_loaded('intl') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: intl' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: intl' ]
             );
         }
 

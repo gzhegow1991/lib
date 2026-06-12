@@ -12,6 +12,7 @@ use Gzhegow\Lib\Modules\Bcmath\Number;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 /**
@@ -33,8 +34,8 @@ class BcmathModule
     public function __initialize()
     {
         if ( ! extension_loaded('bcmath') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: bcmath' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: bcmath' ]
             );
         }
 

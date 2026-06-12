@@ -6,6 +6,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class CryptModule
@@ -59,8 +60,8 @@ class CryptModule
     public function __initialize()
     {
         if ( ! extension_loaded('mcrypt') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: mcrypt' ]
+            throw new ExtensionException(
+                [ 'The extension is missing: mcrypt' ]
             );
         }
 
