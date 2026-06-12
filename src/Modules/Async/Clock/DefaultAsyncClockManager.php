@@ -3,18 +3,18 @@
 namespace Gzhegow\Lib\Modules\Async\Clock;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
+use Gzhegow\Lib\Modules\Async\Loop\AsyncLoopManagerInterface;
 
 
-class DefaultClockManager implements ClockManagerInterface
+class DefaultAsyncClockManager implements AsyncClockManagerInterface
 {
     /**
-     * @var LoopManagerInterface
+     * @var AsyncLoopManagerInterface
      */
     protected $loopManager;
 
 
-    public function __construct(LoopManagerInterface $loopManager)
+    public function __construct(AsyncLoopManagerInterface $loopManager)
     {
         $this->loopManager = $loopManager;
     }
@@ -22,16 +22,16 @@ class DefaultClockManager implements ClockManagerInterface
 
     public function isTimeout($value) : bool
     {
-        return $value instanceof Timeout;
+        return $value instanceof AsyncTimeout;
     }
 
-    public function setTimeout(int $waitMs, callable $fn) : Timeout
+    public function setTimeout(int $waitMs, callable $fn) : AsyncTimeout
     {
         $theType = Lib::type();
 
         $waitMsInt = $theType->int_non_negative($waitMs)->orThrow();
 
-        $timer = new Timeout();
+        $timer = new AsyncTimeout();
         $timer->fnHandler = $fn;
         $timer->waitMs = $waitMsInt;
 
@@ -42,7 +42,7 @@ class DefaultClockManager implements ClockManagerInterface
         return $timer;
     }
 
-    public function clearTimeout(Timeout $timer) : void
+    public function clearTimeout(AsyncTimeout $timer) : void
     {
         $this->loopManager->clearTimeout($timer);
     }
@@ -50,16 +50,16 @@ class DefaultClockManager implements ClockManagerInterface
 
     public function isInterval($value) : bool
     {
-        return $value instanceof Interval;
+        return $value instanceof AsyncInterval;
     }
 
-    public function setInterval(int $waitMs, callable $fn) : Interval
+    public function setInterval(int $waitMs, callable $fn) : AsyncInterval
     {
         $theType = Lib::type();
 
         $waitMsInt = $theType->int_non_negative($waitMs)->orThrow();
 
-        $interval = new Interval();
+        $interval = new AsyncInterval();
         $interval->fnHandler = $fn;
         $interval->waitMs = $waitMsInt;
 
@@ -70,7 +70,7 @@ class DefaultClockManager implements ClockManagerInterface
         return $interval;
     }
 
-    public function clearInterval(Interval $interval) : void
+    public function clearInterval(AsyncInterval $interval) : void
     {
         $this->loopManager->clearInterval($interval);
     }

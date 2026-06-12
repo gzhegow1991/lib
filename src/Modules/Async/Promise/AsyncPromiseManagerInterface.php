@@ -5,7 +5,7 @@ namespace Gzhegow\Lib\Modules\Async\Promise;
 use Gzhegow\Lib\Modules\Type\Ret;
 
 
-interface PromiseManagerInterface
+interface AsyncPromiseManagerInterface
 {
     /**
      * @return Ret<Promise>|Promise

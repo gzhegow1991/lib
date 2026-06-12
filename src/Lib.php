@@ -34,8 +34,8 @@ use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
-use Gzhegow\Lib\Modules\Test\TestCase;
-use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
+use Gzhegow\Lib\Modules\Test\TestCase\TestCase;
+use Gzhegow\Lib\Modules\Func\Pipe\FuncPipe;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\EntrypointModule;
@@ -50,20 +50,21 @@ use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 use Gzhegow\Lib\Modules\Format\FormatSerialize;
 use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafeProxy;
 use Gzhegow\Lib\Modules\Php\Microtimer\Microtimer;
-use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
+use Gzhegow\Lib\Modules\Debug\Dumper\DebugDumperInterface;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
 use Gzhegow\Lib\Modules\Fs\SocketSafe\SocketSafeProxy;
 use Gzhegow\Lib\Modules\Fs\StreamSafe\StreamSafeProxy;
-use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
+use Gzhegow\Lib\Modules\Func\Invoker\FuncInvokerInterface;
 use Gzhegow\Lib\Modules\Http\Cookies\CookiesInterface;
-use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
-use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
+use Gzhegow\Lib\Modules\Async\Loop\AsyncLoopManagerInterface;
+use Gzhegow\Lib\Modules\Async\FetchApi\AsyncFetchApiInterface;
 use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
-use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncClockManagerInterface;
 use Gzhegow\Lib\Modules\Php\Process\ProcessManagerInterface;
-use Gzhegow\Lib\Modules\Debug\Backtracer\BacktracerInterface;
-use Gzhegow\Lib\Modules\Debug\Throwabler\ThrowablerInterface;
-use Gzhegow\Lib\Modules\Async\Promise\PromiseManagerInterface;
+use Gzhegow\Lib\Modules\Debug\Backtracer\DebugBacktracerInterface;
+use Gzhegow\Lib\Modules\Debug\Throwabler\DebugThrowablerInterface;
+use Gzhegow\Lib\Modules\Test\TestDumper\TestPrinterInterface;
+use Gzhegow\Lib\Modules\Async\Promise\AsyncPromiseManagerInterface;
 use Gzhegow\Lib\Modules\Str\Interpolator\InterpolatorInterface;
 use Gzhegow\Lib\Modules\Social\EmailParser\EmailParserInterface;
 use Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafeProxy;
@@ -83,28 +84,28 @@ class Lib
         return static::$async = static::$async ?? (new AsyncModule())->__initialize();
     }
 
-    public static function asyncClock(?bool $clone = null) : ClockManagerInterface
+    public static function asyncClock(?bool $clone = null) : AsyncClockManagerInterface
     {
         return $clone
             ? Lib::async()->cloneClockManager()
             : Lib::async()->clockManager();
     }
 
-    public static function asyncFetchApi(?bool $clone = null) : FetchApiInterface
+    public static function asyncFetchApi(?bool $clone = null) : AsyncFetchApiInterface
     {
         return $clone
             ? Lib::async()->cloneFetchApi()
             : Lib::async()->fetchApi();
     }
 
-    public static function asyncLoop(?bool $clone = null) : LoopManagerInterface
+    public static function asyncLoop(?bool $clone = null) : AsyncLoopManagerInterface
     {
         return $clone
             ? Lib::async()->cloneLoopManager()
             : Lib::async()->loopManager();
     }
 
-    public static function asyncPromise(?bool $clone = null) : PromiseManagerInterface
+    public static function asyncPromise(?bool $clone = null) : AsyncPromiseManagerInterface
     {
         return $clone
             ? Lib::async()->clonePromiseManager()
@@ -144,21 +145,21 @@ class Lib
         return static::$debug = static::$debug ?? (new DebugModule())->__initialize();
     }
 
-    public static function debugBacktracer(?bool $clone = null) : BacktracerInterface
+    public static function debugBacktracer(?bool $clone = null) : DebugBacktracerInterface
     {
         return $clone
             ? Lib::debug()->cloneBacktracer()
             : Lib::debug()->backtracer();
     }
 
-    public static function debugDumper(?bool $clone = null) : DumperInterface
+    public static function debugDumper(?bool $clone = null) : DebugDumperInterface
     {
         return $clone
             ? Lib::debug()->cloneDumper()
             : Lib::debug()->dumper();
     }
 
-    public static function debugThrowabler(?bool $clone = null) : ThrowablerInterface
+    public static function debugThrowabler(?bool $clone = null) : DebugThrowablerInterface
     {
         return $clone
             ? Lib::debug()->cloneThrowabler()
@@ -229,7 +230,7 @@ class Lib
         return static::$func = static::$func ?? (new FuncModule())->__initialize();
     }
 
-    public static function funcInvoker(?bool $clone = null) : InvokerInterface
+    public static function funcInvoker(?bool $clone = null) : FuncInvokerInterface
     {
         return $clone
             ? Lib::func()->cloneInvoker()
@@ -608,9 +609,9 @@ class Lib
     /**
      * > фабрика для Pipe - конвеер колбэков, удобно применять в контроллерах при сложной логике
      *
-     * @param Pipe $ref
+     * @param FuncPipe $ref
      *
-     * @return Pipe
+     * @return FuncPipe
      */
     public static function newPipe(&$ref = null)
     {
@@ -626,61 +627,156 @@ class Lib
      */
     public static function newTestCase(&$ref = null)
     {
-        return $ref = Lib::test()->newTestCase();
+        return $ref = Lib::test()->newCase();
     }
 
 
-    public function to_bool($value, array $options = []) : bool
+    public function to_bool($value, $options = null) : bool
     {
         return Lib::php()->to_bool($value, $options);
     }
 
-    public function to_int($value, array $options = []) : int
+    public function to_int($value, $options = null) : int
     {
         return Lib::php()->to_int($value, $options);
     }
 
-    public function to_float($value, array $options = []) : float
+    public function to_float($value, $options = null) : float
     {
         return Lib::php()->to_float($value, $options);
     }
 
-    public function to_string($value, array $options = []) : string
+    public function to_string($value, $options = null) : string
     {
         return Lib::php()->to_string($value, $options);
     }
 
 
-    public function to_array($value, array $options = []) : array
+    public function to_array($value, $options = null) : array
     {
         return Lib::php()->to_array($value, $options);
     }
 
-    public function to_stdclass($value, array $options = []) : \stdClass
+    public function to_stdclass($value, $options = null) : \stdClass
     {
         return Lib::php()->to_stdclass($value, $options);
     }
 
-    public function to_iterable($value, array $options = []) : iterable
+
+    public function to_index($value, $options = null) : array
+    {
+        return Lib::php()->to_index($value, $options);
+    }
+
+    public function to_list($value, $options = null) : array
+    {
+        return Lib::php()->to_list($value, $options);
+    }
+
+
+    public function to_iterable($value, $options = null) : iterable
     {
         return Lib::php()->to_iterable($value, $options);
     }
 
 
-    public function to_index($value, $options = []) : array
+    /**
+     * > https://example.com/example#example?example=1
+     * * > /example#example?example=1
+     *
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     */
+    public function to_uri(
+        $url = true, $query = null, $fragment = null,
+        $isHostIdnaAscii = null, $isLinkUrlencoded = null,
+        array $refs = []
+    ) : string
     {
-        return Lib::php()->to_index($value, $options);
+        return Lib::url()->to_uri(
+            $url, $query, $fragment,
+            $isHostIdnaAscii, $isLinkUrlencoded,
+            $refs
+        );
     }
 
 
-    public function to_list($value, array $options = []) : array
+    /**
+     * > https://example.com/example#example?example=1
+     *
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     */
+    public function to_url(
+        $url = true, $query = null, $fragment = null,
+        $isHostIdnaAscii = null, $isLinkUrlencoded = null,
+        array $refs = []
+    ) : string
     {
-        return Lib::php()->to_list($value, $options);
+        return Lib::url()->to_url(
+            $url, $query, $fragment,
+            $isHostIdnaAscii, $isLinkUrlencoded,
+            $refs
+        );
     }
 
-    public function to_list_it($value, array $options = []) : \Generator
+    /**
+     * > /example#example?example=1
+     *
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     */
+    public function to_link(
+        $url = true, $query = null, $fragment = null,
+        $isLinkUrlencoded = null,
+        array $refs = []
+    ) : string
     {
-        return Lib::php()->to_list_it($value, $options);
+        return Lib::url()->to_link(
+            $url, $query, $fragment,
+            $isLinkUrlencoded,
+            $refs
+        );
+    }
+
+
+    /**
+     * > https://example.com/
+     *
+     * @param string|true $url
+     */
+    public function to_host(
+        $url = true,
+        $isHostIdnaAscii = null,
+        array $refs = []
+    ) : string
+    {
+        return Lib::url()->to_host(
+            $url,
+            $isHostIdnaAscii,
+            $refs
+        );
+    }
+
+    /**
+     * > example.com
+     *
+     * @param string|true $url
+     */
+    public function to_domain(
+        $url = true,
+        $isHostIdnaAscii = null,
+        array $refs = []
+    ) : string
+    {
+        return Lib::url()->to_domain(
+            $url,
+            $isHostIdnaAscii,
+            $refs
+        );
     }
 
 
@@ -915,7 +1011,7 @@ class Lib
     }
 
 
-    public static function dumper($dumper = null, $printer = null) : DumperInterface
+    public static function dumper($dumper = null, $printer = null) : DebugDumperInterface
     {
         $theDebugDumper = Lib::debugDumper(false);
 
@@ -934,7 +1030,7 @@ class Lib
         return $theDebugDumper;
     }
 
-    public static function newDumper($dumper = null, $printer = null) : DumperInterface
+    public static function newDumper($dumper = null, $printer = null) : DebugDumperInterface
     {
         $theDebugDumper = Lib::debugDumper(true);
 

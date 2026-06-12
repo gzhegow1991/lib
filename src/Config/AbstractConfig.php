@@ -185,7 +185,8 @@ abstract class AbstractConfig implements
                 }
             }
 
-            call_user_func_array($fn, [ $this, $context ]);
+            // > call_user_func_array($fn, [ $this, $context ]);
+            $fn($this, $context);
 
             foreach ( $this->__keys as $key => $devnull ) {
                 if ( isset($this->__children[$key]) ) {

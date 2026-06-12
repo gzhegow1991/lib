@@ -223,10 +223,8 @@ class DefaultCookies implements CookiesInterface
         if ( ! $this->useQueueMode ) {
             $theHttp = Lib::http();
 
-            call_user_func_array(
-                [ $theHttp, 'setrawcookie' ],
-                $setrawcookieArgs
-            );
+            // > call_user_func_array([ $theHttp, 'setrawcookie' ], $setrawcookieArgs);
+            $theHttp->setrawcookie(...$setrawcookieArgs);
 
             $this->cookiesListAlreadySent[$cookieId] = $httpCookie;
         }
@@ -262,10 +260,8 @@ class DefaultCookies implements CookiesInterface
             $setrawcookieArgs[1] = '';
             $setrawcookieArgs[2]['expires'] = time() - 99999;
 
-            call_user_func_array(
-                [ $theHttp, 'setrawcookie' ],
-                $setrawcookieArgs
-            );
+            // > call_user_func_array([ $theHttp, 'setrawcookie' ], $setrawcookieArgs);
+            $theHttp->setrawcookie(...$setrawcookieArgs);
         }
 
         return $this;
@@ -338,10 +334,10 @@ class DefaultCookies implements CookiesInterface
                     continue;
                 }
 
-                call_user_func_array(
-                    [ $theHttp, 'setrawcookie' ],
-                    $httpCookie->toArraySetrawcookieArgs()
-                );
+                $setrawcookieArgs = $httpCookie->toArraySetrawcookieArgs();
+
+                // > call_user_func_array([ $theHttp, 'setrawcookie' ], $setrawcookieArgs);
+                $theHttp->setrawcookie(...$setrawcookieArgs);
 
                 $this->cookiesListAlreadySent[$cookieId] = $httpCookie;
             }

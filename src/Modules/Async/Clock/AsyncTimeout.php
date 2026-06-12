@@ -3,6 +3,6 @@
 namespace Gzhegow\Lib\Modules\Async\Clock;
 
 
-class Timeout extends AbstractTimer
+class AsyncTimeout extends AbstractAsyncTimer
 {
 }

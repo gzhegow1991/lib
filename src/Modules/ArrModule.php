@@ -686,7 +686,10 @@ class ArrModule
         foreach ( $value as $i => $v ) {
             $vArgs = array_merge([ $v ], $fnArgs);
 
-            if ( ! call_user_func_array($fn, $vArgs) ) {
+            // > $res = call_user_func_array($fn, $vArgs);
+            $res = $fn(...$vArgs);
+
+            if ( ! $res ) {
                 return Ret::throw(
                     $fb,
                     [ 'Each of `value` should pass passed `fn` check', $v, $i, $fn, $fnArgs ],
@@ -2820,7 +2823,10 @@ class ArrModule
             if ( $isUseKey ) $args[] = $key;
             if ( $isUseSrc ) $args[] = $copy;
 
-            if ( call_user_func_array($fn, $args) ) {
+            // > $res = call_user_func_array($fn, $args);
+            $res = $fn(...$args);
+
+            if ( $res ) {
                 if ( $hasReplace ) {
                     $copy[$key] = $replace[0];
 
@@ -2905,7 +2911,10 @@ class ArrModule
             if ( $isUseKey ) $args[] = $key;
             if ( $isUseSrc ) $args[] = $copy;
 
-            if ( call_user_func_array($fn, $args) ) {
+            // > $res = call_user_func_array($fn, $args);
+            $res = $fn(...$args);
+
+            if ( $res ) {
                 continue;
             }
 
@@ -2952,7 +2961,10 @@ class ArrModule
             if ( $isUseKey ) $args[] = $key;
             if ( $isUseSrc ) $args[] = $copy;
 
-            if ( call_user_func_array($fn, $args) ) {
+            // > $res = call_user_func_array($fn, $args);
+            $res = $fn(...$args);
+
+            if ( $res ) {
                 continue;
             }
 
@@ -2993,7 +3005,10 @@ class ArrModule
             if ( $isUseKey ) $args[] = $key;
             if ( $isUseSrc ) $args[] = $src;
 
-            $copy[$key] = call_user_func_array($fn, $args);
+            // > $res = call_user_func_array($fn, $args);
+            $res = $fn(...$args);
+
+            $copy[$key] = $res;
         }
 
         return $copy;
@@ -3030,7 +3045,8 @@ class ArrModule
             if ( $isUseKey ) $args[] = $key;
             if ( $isUseSrc ) $args[] = $copy;
 
-            call_user_func_array($fn, $args);
+            // > call_user_func_array($fn, $args);
+            $fn(...$args);
         }
 
         return $copy;
@@ -3075,7 +3091,8 @@ class ArrModule
             if ( $isUseKey ) $args[] = $key;
             if ( $isUseSrc ) $args[] = $copy;
 
-            $current = call_user_func_array($fn, $args);
+            // > $current = call_user_func_array($fn, $args);
+            $current = $fn(...$args);
         }
 
         return $current;
@@ -3142,7 +3159,10 @@ class ArrModule
             if ( $isUseKey ) $args[] = $key;
             if ( $isUseSrc ) $args[] = $src;
 
-            call_user_func_array($fn, $args)
+            // > $res = call_user_func_array($fn, $args);
+            $res = $fn(...$args);
+
+            $res
                 ? ($left[$key] = $val)
                 : ($right[$key] = $val);
         }
@@ -3183,7 +3203,8 @@ class ArrModule
             if ( $isUseKey ) $args[] = $key;
             if ( $isUseSrc ) $args[] = $src;
 
-            $groupNames = call_user_func_array($fn, $args);
+            // > $groupNames = call_user_func_array($fn, $args);
+            $groupNames = $fn(...$args);
 
             foreach ( (array) $groupNames as $groupName ) {
                 $result[$groupName][$key] = $val;

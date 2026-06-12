@@ -2,7 +2,9 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Modules\Test\TestCase;
+use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Test\TestCase\TestCase;
+use Gzhegow\Lib\Modules\Test\TestCase\TestCaseInterface;
 
 
 class TestModule
@@ -17,8 +19,13 @@ class TestModule
     }
 
 
-    public function newTestCase() : TestCase
+    public function newCase(\Closure $fn, array $args = []) : TestCaseInterface
     {
-        return TestCase::new();
+        $trace = Lib::debug()->trace([], 1);
+
+        return TestCase::new()
+            ->fn($fn, $args)
+            ->setTrace($trace)
+        ;
     }
 }

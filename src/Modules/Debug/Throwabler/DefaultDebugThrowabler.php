@@ -4,7 +4,6 @@
 
 namespace Gzhegow\Lib\Modules\Debug\Throwabler;
 
-use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\ExceptInterface;
 use Gzhegow\Lib\Exception\Iterator\ExceptionIterator;
@@ -12,7 +11,7 @@ use Gzhegow\Lib\Exception\Interfaces\HasMessageListInterface;
 use Gzhegow\Lib\Exception\Interfaces\HasTraceOverrideInterface;
 
 
-class DefaultThrowabler implements ThrowablerInterface
+class DefaultDebugThrowabler implements DebugThrowablerInterface
 {
     /**
      * @param \Throwable|ExceptInterface $throwable

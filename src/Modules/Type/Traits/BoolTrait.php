@@ -1868,9 +1868,21 @@ trait BoolTrait
 	}
 
 
+	public function uuid_nil($value): bool
+	{
+		return Lib::random()->type_uuid_nil(null, $value)->isOk();
+	}
+
+
 	public function uuid($value): bool
 	{
 		return Lib::random()->type_uuid(null, $value)->isOk();
+	}
+
+
+	public function uuid_not_nil($value): bool
+	{
+		return Lib::random()->type_uuid_not_nil(null, $value)->isOk();
 	}
 
 
@@ -2227,23 +2239,9 @@ trait BoolTrait
 
 
 	/**
-	 * @param string|true             $url
-	 * @param string|false|array|null $query
-	 * @param string|false|null       $fragment
-	 */
-	public function url(
-		$url,
-		$query = null,
-		$fragment = null,
-		int $isHostIdnaAscii = null,
-		int $isLinkUrlencoded = null,
-		array $refs = []
-	): bool {
-		return Lib::url()->type_url(null, $url, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs)->isOk();
-	}
-
-
-	/**
+	 * > https://example.com:8080/example#example?example=1
+	 * > /example#example?example=1
+	 *
 	 * @param string|true             $url
 	 * @param string|false|array|null $query
 	 * @param string|false|null       $fragment
@@ -2261,24 +2259,27 @@ trait BoolTrait
 
 
 	/**
-	 * @param string|true $url
+	 * > https://example.com:8080/example#example?example=1
+	 *
+	 * @param string|true             $url
+	 * @param string|false|array|null $query
+	 * @param string|false|null       $fragment
 	 */
-	public function host($url, int $isHostIdnaAscii = null, array $refs = []): bool
-	{
-		return Lib::url()->type_host(null, $url, $isHostIdnaAscii, $refs)->isOk();
+	public function url(
+		$url,
+		$query = null,
+		$fragment = null,
+		int $isHostIdnaAscii = null,
+		int $isLinkUrlencoded = null,
+		array $refs = []
+	): bool {
+		return Lib::url()->type_url(null, $url, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs)->isOk();
 	}
 
 
 	/**
-	 * @param string|true $url
-	 */
-	public function domain($url, int $isHostIdnaAscii = null, array $refs = []): bool
-	{
-		return Lib::url()->type_domain(null, $url, $isHostIdnaAscii, $refs)->isOk();
-	}
-
-
-	/**
+	 * > /example#example?example=1
+	 *
 	 * @param string|true             $url
 	 * @param string|false|array|null $query
 	 * @param string|false|null       $fragment
@@ -2289,6 +2290,32 @@ trait BoolTrait
 	}
 
 
+	/**
+	 * > https://example.com:8080/
+	 *
+	 * @param string|true $url
+	 */
+	public function host($url, int $isHostIdnaAscii = null, array $refs = []): bool
+	{
+		return Lib::url()->type_host(null, $url, $isHostIdnaAscii, $refs)->isOk();
+	}
+
+
+	/**
+	 * > example.com
+	 *
+	 * @param string|true $url
+	 */
+	public function domain($url, int $isHostIdnaAscii = null, array $refs = []): bool
+	{
+		return Lib::url()->type_domain(null, $url, $isHostIdnaAscii, $refs)->isOk();
+	}
+
+
+	/**
+	 * > mysql:host=localhost;dbname=testdb;charset=utf8mb4
+	 * > sqlite::memory:
+	 */
 	public function dsn_pdo($dsn, array $refs = []): bool
 	{
 		return Lib::url()->type_dsn_pdo(null, $dsn, $refs)->isOk();

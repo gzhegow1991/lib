@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Async\Promise;
 
+
 class PromiseSettler
 {
     const TYPE_THEN    = 'then';

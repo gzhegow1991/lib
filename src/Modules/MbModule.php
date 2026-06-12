@@ -46,9 +46,7 @@ class MbModule
     public function __call($name, $arguments)
     {
         if ( 'mb_' === substr($name, 0, 3) ) {
-            if ( function_exists($name) ) {
-                return call_user_func_array($name, $arguments);
-            }
+            return call_user_func_array($name, $arguments);
         }
 
         throw new RuntimeException([ 'Method not found: ' . $name ]);

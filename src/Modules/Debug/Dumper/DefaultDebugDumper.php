@@ -15,7 +15,7 @@ use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\ComposerException;
 
 
-class DefaultDumper implements DumperInterface
+class DefaultDebugDumper implements DebugDumperInterface
 {
     const SYMFONY_VAR_DUMPER       = '\Symfony\Component\VarDumper\VarDumper';
     const SYMFONY_CLONER_INTERFACE = '\Symfony\Component\VarDumper\Cloner\ClonerInterface';

@@ -2,14 +2,14 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Modules\Async\Loop\DefaultLoopManager;
-use Gzhegow\Lib\Modules\Async\Clock\DefaultClockManager;
-use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
-use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
-use Gzhegow\Lib\Modules\Async\FetchApi\FilesystemFetchApi;
-use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
-use Gzhegow\Lib\Modules\Async\Promise\DefaultPromiseManager;
-use Gzhegow\Lib\Modules\Async\Promise\PromiseManagerInterface;
+use Gzhegow\Lib\Modules\Async\Loop\DefaultAsyncLoopManager;
+use Gzhegow\Lib\Modules\Async\Clock\DefaultAsyncClockManager;
+use Gzhegow\Lib\Modules\Async\Loop\AsyncLoopManagerInterface;
+use Gzhegow\Lib\Modules\Async\FetchApi\AsyncFetchApiInterface;
+use Gzhegow\Lib\Modules\Async\FetchApi\FilesystemAsyncFetchApi;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncClockManagerInterface;
+use Gzhegow\Lib\Modules\Async\Promise\DefaultAsyncPromiseManager;
+use Gzhegow\Lib\Modules\Async\Promise\AsyncPromiseManagerInterface;
 use Gzhegow\Lib\Modules\Async\Promise\Pooling\DefaultPromisePoolingFactory;
 use Gzhegow\Lib\Modules\Async\Promise\Pooling\PromisePoolingFactoryInterface;
 
@@ -22,19 +22,19 @@ class AsyncModule
     protected $poolingFactory;
 
     /**
-     * @var ClockManagerInterface
+     * @var AsyncClockManagerInterface
      */
     protected $clockManager;
     /**
-     * @var FetchApiInterface
+     * @var AsyncFetchApiInterface
      */
     protected $fetchApi;
     /**
-     * @var LoopManagerInterface
+     * @var AsyncLoopManagerInterface
      */
     protected $loopManager;
     /**
-     * @var PromiseManagerInterface
+     * @var AsyncPromiseManagerInterface
      */
     protected $promiseManager;
 
@@ -70,23 +70,23 @@ class AsyncModule
     }
 
 
-    public function newClockManager() : ClockManagerInterface
+    public function newClockManager() : AsyncClockManagerInterface
     {
         $theLoopManager = $this->loopManager();
 
-        $instance = new DefaultClockManager(
+        $instance = new DefaultAsyncClockManager(
             $theLoopManager
         );
 
         return $instance;
     }
 
-    public function cloneClockManager() : ClockManagerInterface
+    public function cloneClockManager() : AsyncClockManagerInterface
     {
         return clone $this->clockManager();
     }
 
-    public function clockManager(?ClockManagerInterface $clockManager = null) : ClockManagerInterface
+    public function clockManager(?AsyncClockManagerInterface $clockManager = null) : AsyncClockManagerInterface
     {
         return $this->clockManager = null
             ?? $clockManager
@@ -95,19 +95,19 @@ class AsyncModule
     }
 
 
-    public function newFetchApi() : FetchApiInterface
+    public function newFetchApi() : AsyncFetchApiInterface
     {
-        $instance = new FilesystemFetchApi();
+        $instance = new FilesystemAsyncFetchApi();
 
         return $instance;
     }
 
-    public function cloneFetchApi() : FetchApiInterface
+    public function cloneFetchApi() : AsyncFetchApiInterface
     {
         return clone $this->fetchApi();
     }
 
-    public function fetchApi(?FetchApiInterface $fetchApi = null) : FetchApiInterface
+    public function fetchApi(?AsyncFetchApiInterface $fetchApi = null) : AsyncFetchApiInterface
     {
         return $this->fetchApi = null
             ?? $fetchApi
@@ -116,19 +116,19 @@ class AsyncModule
     }
 
 
-    public function newLoopManager() : LoopManagerInterface
+    public function newLoopManager() : AsyncLoopManagerInterface
     {
-        $instance = new DefaultLoopManager();
+        $instance = new DefaultAsyncLoopManager();
 
         return $instance;
     }
 
-    public function cloneLoopManager() : LoopManagerInterface
+    public function cloneLoopManager() : AsyncLoopManagerInterface
     {
         return clone $this->loopManager();
     }
 
-    public function loopManager(?LoopManagerInterface $loopManager = null) : LoopManagerInterface
+    public function loopManager(?AsyncLoopManagerInterface $loopManager = null) : AsyncLoopManagerInterface
     {
         return $this->loopManager = null
             ?? $loopManager
@@ -137,14 +137,14 @@ class AsyncModule
     }
 
 
-    public function newPromiseManager() : PromiseManagerInterface
+    public function newPromiseManager() : AsyncPromiseManagerInterface
     {
         $thePoolingFactory = $this->poolingFactory();
         $theClockManager = $this->clockManager();
         $theLoopManager = $this->loopManager();
         $theFetchApi = $this->fetchApi();
 
-        $instance = new DefaultPromiseManager(
+        $instance = new DefaultAsyncPromiseManager(
             $thePoolingFactory,
             //
             $theClockManager,
@@ -156,12 +156,12 @@ class AsyncModule
         return $instance;
     }
 
-    public function clonePromiseManager() : PromiseManagerInterface
+    public function clonePromiseManager() : AsyncPromiseManagerInterface
     {
         return clone $this->promiseManager();
     }
 
-    public function promiseManager(?PromiseManagerInterface $promiseFactory = null) : PromiseManagerInterface
+    public function promiseManager(?AsyncPromiseManagerInterface $promiseFactory = null) : AsyncPromiseManagerInterface
     {
         return $this->promiseManager = null
             ?? $promiseFactory

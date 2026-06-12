@@ -13,6 +13,10 @@ class CliModule
 
     public function __initialize()
     {
+        $thePhp = Lib::php();
+
+        $thePhp->assert_sapi_terminal();
+
         return $this;
     }
 
@@ -24,8 +28,6 @@ class CliModule
     {
         $theDebug = Lib::debug();
         $thePhp = Lib::php();
-
-        $thePhp->assert_sapi_terminal();
 
         if ( null !== $var ) {
             $theDebugDumper = $theDebug->dumper();
@@ -42,10 +44,6 @@ class CliModule
 
     public function stop(...$vars) : void
     {
-        $thePhp = Lib::php();
-
-        $thePhp->assert_sapi_terminal();
-
         $this->pause(...$vars);
 
         exit(1);
@@ -55,8 +53,6 @@ class CliModule
     public function readln() : string
     {
         $thePhp = Lib::php();
-
-        $thePhp->assert_sapi_terminal();
 
         $h = $thePhp->stdin();
 
@@ -69,8 +65,6 @@ class CliModule
     {
         $thePhp = Lib::php();
         $theStr = Lib::str();
-
-        $thePhp->assert_sapi_terminal();
 
         $delimiter = $delimiter ?? '```';
 
@@ -118,10 +112,6 @@ class CliModule
 
     public function yes(string $message, ?string &$refAnswer = null) : bool
     {
-        $thePhp = Lib::php();
-
-        $thePhp->assert_sapi_terminal();
-
         $refAnswer = $refAnswer ?? 'n';
 
         $isYes = ('y' === $refAnswer) || ('yy' === $refAnswer);

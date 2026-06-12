@@ -5,7 +5,7 @@ namespace Gzhegow\Lib\Modules\Async\Promise;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\PromiseException;
-use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
+use Gzhegow\Lib\Modules\Async\Loop\AsyncLoopManagerInterface;
 
 
 class Promise
@@ -34,11 +34,11 @@ class Promise
     public $debugInfo;
 
     /**
-     * @var PromiseManagerInterface
+     * @var AsyncPromiseManagerInterface
      */
     protected $manager;
     /**
-     * @var LoopManagerInterface
+     * @var AsyncLoopManagerInterface
      */
     protected $loop;
 
@@ -66,9 +66,9 @@ class Promise
 
 
     public function __construct(
-        PromiseManagerInterface $manager,
+        AsyncPromiseManagerInterface $manager,
         //
-        LoopManagerInterface $loop
+        AsyncLoopManagerInterface $loop
     )
     {
         $this->manager = $manager;
@@ -81,9 +81,9 @@ class Promise
      * @return static
      */
     public static function newPromise(
-        PromiseManagerInterface $manager,
+        AsyncPromiseManagerInterface $manager,
         //
-        LoopManagerInterface $loop,
+        AsyncLoopManagerInterface $loop,
         //
         callable $fnExecutor
     )
@@ -102,9 +102,9 @@ class Promise
      * @return static
      */
     public static function newResolved(
-        PromiseManagerInterface $manager,
+        AsyncPromiseManagerInterface $manager,
         //
-        LoopManagerInterface $loop,
+        AsyncLoopManagerInterface $loop,
         //
         $resolvedValue = null
     )
@@ -120,9 +120,9 @@ class Promise
      * @return static
      */
     public static function newRejected(
-        PromiseManagerInterface $manager,
+        AsyncPromiseManagerInterface $manager,
         //
-        LoopManagerInterface $loop,
+        AsyncLoopManagerInterface $loop,
         //
         $rejectedReason = null
     )
@@ -143,9 +143,9 @@ class Promise
      * @return static
      */
     public static function newNever(
-        PromiseManagerInterface $manager,
+        AsyncPromiseManagerInterface $manager,
         //
-        LoopManagerInterface $loop
+        AsyncLoopManagerInterface $loop
     )
     {
         $instance = new static($manager, $loop);
@@ -158,9 +158,9 @@ class Promise
      * @return static
      */
     public static function newDefer(
-        PromiseManagerInterface $manager,
+        AsyncPromiseManagerInterface $manager,
         //
-        LoopManagerInterface $loop,
+        AsyncLoopManagerInterface $loop,
         //
         ?\Closure &$refFnResolve = null, ?\Closure &$refFnReject = null
     )

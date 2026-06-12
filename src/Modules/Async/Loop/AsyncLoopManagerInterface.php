@@ -2,32 +2,32 @@
 
 namespace Gzhegow\Lib\Modules\Async\Loop;
 
-use Gzhegow\Lib\Modules\Async\Clock\Timeout;
-use Gzhegow\Lib\Modules\Async\Clock\Interval;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncTimeout;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncInterval;
 
 
-interface LoopManagerInterface
+interface AsyncLoopManagerInterface
 {
     /**
      * @return static
      */
-    public function addInterval(Interval $interval);
+    public function addInterval(AsyncInterval $interval);
 
     /**
      * @return static
      */
-    public function clearInterval(Interval $interval);
+    public function clearInterval(AsyncInterval $interval);
 
 
     /**
      * @return static
      */
-    public function addTimeout(Timeout $timer);
+    public function addTimeout(AsyncTimeout $timer);
 
     /**
      * @return static
      */
-    public function clearTimeout(Timeout $timer);
+    public function clearTimeout(AsyncTimeout $timer);
 
 
     /**

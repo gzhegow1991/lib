@@ -9,6 +9,7 @@
 namespace Gzhegow\Lib\Modules\Php\Process;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\ComposerException;
 
 
@@ -21,12 +22,16 @@ class DefaultProcessManager implements ProcessManagerInterface
      * @var bool
      */
     protected $useSymfonyProcess = false;
+    /**
+     * @var bool
+     */
+    protected $useProcOpen = true;
 
 
     /**
      * @return \Symfony\Component\Process\Process
      */
-    public function newSymfonyProcess(Proc $proc) : object
+    public function newSymfonyProcess(ProcessProc $proc) : object
     {
         $process = $proc->newSymfonyProcess();
 
@@ -39,11 +44,11 @@ class DefaultProcessManager implements ProcessManagerInterface
      */
     public function useSymfonyProcess(?bool $useSymfonyProcess = null)
     {
-        $classExists = class_exists(static::SYMFONY_PROCESS_CLASS);
-
-        $useSymfonyProcess = $useSymfonyProcess ?? $classExists;
+        $useSymfonyProcess = $useSymfonyProcess ?? true;
 
         if ( $useSymfonyProcess ) {
+            $classExists = class_exists(static::SYMFONY_PROCESS_CLASS);
+
             if ( ! $classExists ) {
                 $commands = [
                     'composer require symfony/process',
@@ -59,31 +64,47 @@ class DefaultProcessManager implements ProcessManagerInterface
             }
         }
 
+        $this->useProcOpen = false;
+        //
         $this->useSymfonyProcess = $useSymfonyProcess;
 
         return $this;
     }
 
-
-    public function newProc() : Proc
+    /**
+     * @return static
+     */
+    public function useProcOpen(?bool $useProcOpen = null)
     {
-        $processSpawn = new Proc();
+        $useProcOpen = $useProcOpen ?? true;
+
+        $this->useSymfonyProcess = false;
+        //
+        $this->useProcOpen = $useProcOpen;
+
+        return $this;
+    }
+
+
+    public function newProc() : ProcessProc
+    {
+        $processSpawn = new ProcessProc();
 
         return $processSpawn;
     }
 
-    public function newProcNormal() : Proc
+    public function newProcNormal() : ProcessProc
     {
-        $processSpawn = new Proc();
+        $processSpawn = new ProcessProc();
 
         $processSpawn->setIsBackground(false);
 
         return $processSpawn;
     }
 
-    public function newProcBackground() : Proc
+    public function newProcBackground() : ProcessProc
     {
-        $processSpawn = new Proc();
+        $processSpawn = new ProcessProc();
 
         $processSpawn->setIsBackground(true);
 
@@ -94,18 +115,25 @@ class DefaultProcessManager implements ProcessManagerInterface
     /**
      * @return static
      */
-    public function spawn(Proc $proc)
+    public function spawn(ProcessProc $proc)
     {
         $thePhp = Lib::php();
 
         if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ( $thePhp->is_os_windows() ) {
-            $proc->spawnUsingProcOpenWindows();
+        } elseif ( $this->useProcOpen ) {
+            if ( $thePhp->is_os_windows() ) {
+                $proc->spawnUsingProcOpenWindows();
+
+            } else {
+                $proc->spawnUsingProcOpenUnix();
+            }
 
         } else {
-            $proc->spawnUsingProcOpenUnix();
+            throw new RuntimeException(
+                [ 'You must set `useSymfonyProcess` or `useProcOpen`', $this ]
+            );
         }
 
         return $this;
@@ -114,7 +142,7 @@ class DefaultProcessManager implements ProcessManagerInterface
     /**
      * @return static
      */
-    public function spawnNormal(Proc $proc)
+    public function spawnNormal(ProcessProc $proc)
     {
         $thePhp = Lib::php();
 
@@ -123,11 +151,18 @@ class DefaultProcessManager implements ProcessManagerInterface
         if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ( $thePhp->is_os_windows() ) {
-            $proc->spawnUsingProcOpenWindows();
+        } elseif ( $this->useProcOpen ) {
+            if ( $thePhp->is_os_windows() ) {
+                $proc->spawnUsingProcOpenWindows();
+
+            } else {
+                $proc->spawnUsingProcOpenUnix();
+            }
 
         } else {
-            $proc->spawnUsingProcOpenUnix();
+            throw new RuntimeException(
+                [ 'You must set `useSymfonyProcess` or `useProcOpen`', $this ]
+            );
         }
 
         return $this;
@@ -136,7 +171,7 @@ class DefaultProcessManager implements ProcessManagerInterface
     /**
      * @return static
      */
-    public function spawnBackground(Proc $proc)
+    public function spawnBackground(ProcessProc $proc)
     {
         $thePhp = Lib::php();
 
@@ -145,11 +180,18 @@ class DefaultProcessManager implements ProcessManagerInterface
         if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ( $thePhp->is_os_windows() ) {
-            $proc->spawnUsingProcOpenWindows();
+        } elseif ( $this->useProcOpen ) {
+            if ( $thePhp->is_os_windows() ) {
+                $proc->spawnUsingProcOpenWindows();
+
+            } else {
+                $proc->spawnUsingProcOpenUnix();
+            }
 
         } else {
-            $proc->spawnUsingProcOpenUnix();
+            throw new RuntimeException(
+                [ 'You must set `useSymfonyProcess` or `useProcOpen`', $this ]
+            );
         }
 
         return $this;

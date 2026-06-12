@@ -3264,7 +3264,7 @@ class StrModule
             $theType->array_keys_not_exists($dictionary, [ $delimiterChar ])->orThrow();
         }
 
-        $gen = $thePhp->to_list_it($ignoreSymbols);
+        $gen = $thePhp->to_list($ignoreSymbols);
 
         $ignoreSymbolsIndex = [];
         foreach ( $gen as $str ) {

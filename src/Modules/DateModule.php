@@ -179,6 +179,31 @@ class DateModule
     }
 
 
+    public function the_adate_nil() : \DateTime
+    {
+        try {
+            $dateTime = new \DateTime('0000-01-01 00:00:00.000000', new \DateTimeZone('+1234'));
+        }
+        catch ( \Throwable $e ) {
+            throw new LogicException('Unable to create datetime', $e);
+        }
+
+        return $dateTime;
+    }
+
+    public function the_idate_nil() : \DateTimeImmutable
+    {
+        try {
+            $dateTime = new \DateTimeImmutable('0000-01-01 00:00:00.000000', new \DateTimeZone('+1234'));
+        }
+        catch ( \Throwable $e ) {
+            throw new LogicException('Unable to create datetime', $e);
+        }
+
+        return $dateTime;
+    }
+
+
     /**
      * @return Ret<\DateTimeZone>|\DateTimeZone
      */
@@ -2381,7 +2406,7 @@ class DateModule
         try {
             $dateTime = new \DateTime('now', $timezoneFallbackObject);
         }
-        catch ( \Exception $e ) {
+        catch ( \Throwable $e ) {
             throw new LogicException('Unable to create datetime', $e);
         }
 
@@ -2398,7 +2423,7 @@ class DateModule
         try {
             $dateTimeImmutable = new \DateTimeImmutable('now', $timezoneFallbackObject);
         }
-        catch ( \Exception $e ) {
+        catch ( \Throwable $e ) {
             throw new LogicException('Unable to create datetime', $e);
         }
 
@@ -2416,7 +2441,7 @@ class DateModule
         try {
             $dateTime = new \DateTime('1970-01-01 00:00:00.000000', $timezoneFallbackObject);
         }
-        catch ( \Exception $e ) {
+        catch ( \Throwable $e ) {
             throw new LogicException('Unable to create datetime', $e);
         }
 
@@ -2433,7 +2458,7 @@ class DateModule
         try {
             $dateTimeImmutable = new \DateTimeImmutable('1970-01-01 00:00:00.000000', $timezoneFallbackObject);
         }
-        catch ( \Exception $e ) {
+        catch ( \Throwable $e ) {
             throw new LogicException('Unable to create datetime', $e);
         }
 
@@ -2451,7 +2476,7 @@ class DateModule
         try {
             $dateTime = new \DateTime('0000-01-01 00:00:00.000000', $timezoneFallbackObject);
         }
-        catch ( \Exception $e ) {
+        catch ( \Throwable $e ) {
             throw new LogicException('Unable to create datetime', $e);
         }
 
@@ -2468,7 +2493,7 @@ class DateModule
         try {
             $dateTimeImmutable = new \DateTimeImmutable('0000-01-01 00:00:00.000000', $timezoneFallbackObject);
         }
-        catch ( \Exception $e ) {
+        catch ( \Throwable $e ) {
             throw new LogicException('Unable to create datetime', $e);
         }
 

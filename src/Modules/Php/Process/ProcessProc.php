@@ -16,7 +16,7 @@ use Gzhegow\Lib\Exception\Runtime\ComposerException;
 use Gzhegow\Lib\Exception\Runtime\FilesystemException;
 
 
-class Proc
+class ProcessProc
 {
     const SYMFONY_PROCESS_CLASS = '\Symfony\Component\Process\Process';
 
@@ -877,7 +877,8 @@ class Proc
 
 
                 if ( null !== $fnWait ) {
-                    call_user_func_array($fnWait, [ $process ]);
+                    // > call_user_func_array($fnWait, [ $process ]);
+                    $fnWait($process);
                 }
 
                 if ( $process->isRunning() ) {
@@ -932,7 +933,8 @@ class Proc
 
 
                 if ( null !== $fnWait ) {
-                    call_user_func_array($fnWait, [ $ph, $status ]);
+                    // > call_user_func_array($fnWait, [ $ph, $status ]);
+                    $fnWait($ph, $status);
                 }
 
                 if ( $status['running'] ) {
@@ -1002,7 +1004,8 @@ class Proc
 
 
                 if ( null !== $fnWait ) {
-                    call_user_func_array($fnWait, [ $process ]);
+                    // > call_user_func_array($fnWait, [ $process ]);
+                    $fnWait($process);
                 }
 
                 if ( $process->isRunning() ) {
@@ -1058,7 +1061,8 @@ class Proc
 
 
                 if ( null !== $fnWait ) {
-                    call_user_func_array($fnWait, [ $ph, $status ]);
+                    // > call_user_func_array($fnWait, [ $ph, $status ]);
+                    $fnWait($ph, $status);
                 }
 
                 if ( $status['running'] ) {

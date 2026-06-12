@@ -2,10 +2,11 @@
 
 namespace Gzhegow\Lib\Modules\Func\Pipe;
 
-class PipeContext
+
+class FuncPipeContext
 {
     /**
-     * @var Pipe
+     * @var FuncPipe
      */
     protected $pipe;
 
@@ -21,7 +22,7 @@ class PipeContext
     }
 
 
-    public function getPipe() : Pipe
+    public function getPipe() : FuncPipe
     {
         return $this->pipe;
     }
@@ -29,7 +30,7 @@ class PipeContext
     /**
      * @return static
      */
-    public function setPipe(Pipe $pipe)
+    public function setPipe(FuncPipe $pipe)
     {
         $this->pipe = $pipe;
 

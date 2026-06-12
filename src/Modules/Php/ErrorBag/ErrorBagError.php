@@ -2,7 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Php\ErrorBag;
 
-class Error
+class ErrorBagError
 {
     /**
      * @var mixed

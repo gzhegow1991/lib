@@ -4,16 +4,47 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper;
-use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
-use Gzhegow\Lib\Modules\Debug\Throwabler\DefaultThrowabler;
-use Gzhegow\Lib\Modules\Debug\Backtracer\DefaultBacktracer;
-use Gzhegow\Lib\Modules\Debug\Throwabler\ThrowablerInterface;
-use Gzhegow\Lib\Modules\Debug\Backtracer\BacktracerInterface;
+use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDebugDumper;
+use Gzhegow\Lib\Modules\Debug\Dumper\DebugDumperInterface;
+use Gzhegow\Lib\Modules\Debug\Throwabler\DefaultDebugThrowabler;
+use Gzhegow\Lib\Modules\Debug\Backtracer\DefaultDebugBacktracer;
+use Gzhegow\Lib\Modules\Debug\Throwabler\DebugThrowablerInterface;
+use Gzhegow\Lib\Modules\Debug\Backtracer\DebugBacktracerInterface;
 
 
 class DebugModule
 {
+    const VAR_DUMP_OPT_ARRAY_INDENT     = 'array_indent';
+    const VAR_DUMP_OPT_ARRAY_LEVEL_MAX  = 'array_level_max';
+    const VAR_DUMP_OPT_ARRAY_NEWLINE    = 'array_newline';
+    const VAR_DUMP_OPT_MULTILINE_ESCAPE = 'multiline_escape';
+    const VAR_DUMP_OPT_WITH_BRACES      = 'with_braces';
+    const VAR_DUMP_OPT_WITH_ID          = 'with_id';
+    const VAR_DUMP_OPT_WITH_TYPE        = 'with_type';
+    const VAR_DUMP_OPT_WITH_VALUE       = 'with_value';
+
+    const VAR_EXPORT_OPT_WITH_ADDCSLASHES = 'with_addcslashes';
+    const VAR_EXPORT_OPT_INDENT           = 'indent';
+    const VAR_EXPORT_OPT_NEWLINE          = 'newline';
+
+    const LIST_VAR_DUMP_OPT = [
+        self::VAR_DUMP_OPT_ARRAY_INDENT     => true,
+        self::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => true,
+        self::VAR_DUMP_OPT_ARRAY_NEWLINE    => true,
+        self::VAR_DUMP_OPT_MULTILINE_ESCAPE => true,
+        self::VAR_DUMP_OPT_WITH_BRACES      => true,
+        self::VAR_DUMP_OPT_WITH_ID          => true,
+        self::VAR_DUMP_OPT_WITH_TYPE        => true,
+        self::VAR_DUMP_OPT_WITH_VALUE       => true,
+    ];
+
+    const LIST_VAR_EXPORT_OPT = [
+        self::VAR_EXPORT_OPT_WITH_ADDCSLASHES => true,
+        self::VAR_EXPORT_OPT_INDENT           => true,
+        self::VAR_EXPORT_OPT_NEWLINE          => true,
+    ];
+
+
     /**
      * @var string
      */
@@ -25,7 +56,11 @@ class DebugModule
     /**
      * @var array
      */
-    protected $stateVarDumpOptions;
+    protected $stateVarExportOptionsDefault;
+    /**
+     * @var array
+     */
+    protected $stateVarDumpOptionsDefault;
 
     /**
      * @param string|false|null $dirRoot
@@ -49,6 +84,7 @@ class DebugModule
             }
         }
 
+        // > null is the default
         // if (null === $this->stateDirRoot) {
         //     $this->stateDirRoot = null;
         // }
@@ -64,7 +100,7 @@ class DebugModule
             $last = $this->stateShouldTrace;
 
             if ( false === $shouldTrace ) {
-                $this->stateShouldTrace = false;
+                $this->stateShouldTrace = null;
 
             } else {
                 $this->stateShouldTrace = (bool) $shouldTrace;
@@ -79,45 +115,104 @@ class DebugModule
     }
 
     /**
-     * @param array|false|null $varDumpOptions
+     * @param array|false|null $varExportOptionsDefault
      */
-    public function stateVarDumpOptions($varDumpOptions = null) : ?array
+    public function stateVarExportOptionsDefault($varExportOptionsDefault = null) : ?array
     {
         $last = null;
 
-        if ( $isChange = (null !== $varDumpOptions) ) {
-            $last = $this->stateVarDumpOptions;
+        if ( $isChange = (null !== $varExportOptionsDefault) ) {
+            $last = $this->stateVarExportOptionsDefault;
 
-            if ( false === $varDumpOptions ) {
-                $this->stateVarDumpOptions = [];
+            if ( false === $varExportOptionsDefault ) {
+                $this->stateVarExportOptionsDefault = null;
 
             } else {
                 $theType = Lib::type();
 
-                $theType->array($varDumpOptions)->orThrow();
+                $theType->array($varExportOptionsDefault)->orThrow();
 
-                $this->stateVarDumpOptions = $varDumpOptions;
+                $this->stateVarExportOptionsDefault = []
+                    + $varExportOptionsDefault
+                    + [
+                        static::VAR_EXPORT_OPT_WITH_ADDCSLASHES => null,
+                        static::VAR_EXPORT_OPT_INDENT           => '',
+                        static::VAR_EXPORT_OPT_NEWLINE          => ' ',
+                    ];
             }
         }
 
-        if ( null === $this->stateVarDumpOptions ) {
-            $this->stateVarDumpOptions = [];
+        if ( null === $this->stateVarExportOptionsDefault ) {
+            $this->stateVarExportOptionsDefault = [
+                static::VAR_EXPORT_OPT_WITH_ADDCSLASHES => null,
+                static::VAR_EXPORT_OPT_INDENT           => '',
+                static::VAR_EXPORT_OPT_NEWLINE          => ' ',
+            ];
         }
 
-        return $isChange ? $last : $this->stateVarDumpOptions;
+        return $isChange ? $last : $this->stateVarExportOptionsDefault;
+    }
+
+    /**
+     * @param array|false|null $varDumpOptionsDefault
+     */
+    public function stateVarDumpOptionsDefault($varDumpOptionsDefault = null) : ?array
+    {
+        $last = null;
+
+        if ( $isChange = (null !== $varDumpOptionsDefault) ) {
+            $last = $this->stateVarDumpOptionsDefault;
+
+            if ( false === $varDumpOptionsDefault ) {
+                $this->stateVarDumpOptionsDefault = null;
+
+            } else {
+                $theType = Lib::type();
+
+                $theType->array($varDumpOptionsDefault)->orThrow();
+
+                $this->stateVarDumpOptionsDefault = []
+                    + $varDumpOptionsDefault
+                    + [
+                        static::VAR_DUMP_OPT_ARRAY_INDENT     => '',
+                        static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 1,
+                        static::VAR_DUMP_OPT_ARRAY_NEWLINE    => ' ',
+                        static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                        static::VAR_DUMP_OPT_WITH_BRACES      => null,
+                        static::VAR_DUMP_OPT_WITH_ID          => null,
+                        static::VAR_DUMP_OPT_WITH_TYPE        => null,
+                        static::VAR_DUMP_OPT_WITH_VALUE       => null,
+                    ];
+            }
+        }
+
+        if ( null === $this->stateVarDumpOptionsDefault ) {
+            $this->stateVarDumpOptionsDefault = [
+                static::VAR_DUMP_OPT_ARRAY_INDENT     => '',
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 1,
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE    => ' ',
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => null,
+                static::VAR_DUMP_OPT_WITH_ID          => null,
+                static::VAR_DUMP_OPT_WITH_TYPE        => null,
+                static::VAR_DUMP_OPT_WITH_VALUE       => null,
+            ];
+        }
+
+        return $isChange ? $last : $this->stateVarDumpOptionsDefault;
     }
 
 
     /**
-     * @var DumperInterface
+     * @var DebugDumperInterface
      */
     protected $dumper;
     /**
-     * @var ThrowablerInterface
+     * @var DebugThrowablerInterface
      */
     protected $throwabler;
     /**
-     * @var BacktracerInterface
+     * @var DebugBacktracerInterface
      */
     protected $backtracer;
 
@@ -132,19 +227,19 @@ class DebugModule
     }
 
 
-    public function newBacktracer() : BacktracerInterface
+    public function newBacktracer() : DebugBacktracerInterface
     {
-        $instance = new DefaultBacktracer();
+        $instance = new DefaultDebugBacktracer();
 
         return $instance;
     }
 
-    public function cloneBacktracer() : BacktracerInterface
+    public function cloneBacktracer() : DebugBacktracerInterface
     {
         return clone $this->backtracer();
     }
 
-    public function backtracer(?BacktracerInterface $backtracer = null) : BacktracerInterface
+    public function backtracer(?DebugBacktracerInterface $backtracer = null) : DebugBacktracerInterface
     {
         return $this->backtracer = null
             ?? $backtracer
@@ -153,19 +248,19 @@ class DebugModule
     }
 
 
-    public function newDumper() : DumperInterface
+    public function newDumper() : DebugDumperInterface
     {
-        $instance = new DefaultDumper();
+        $instance = new DefaultDebugDumper();
 
         return $instance;
     }
 
-    public function cloneDumper() : DumperInterface
+    public function cloneDumper() : DebugDumperInterface
     {
         return clone $this->dumper();
     }
 
-    public function dumper(?DumperInterface $dumper = null) : DumperInterface
+    public function dumper(?DebugDumperInterface $dumper = null) : DebugDumperInterface
     {
         return $this->dumper = null
             ?? $dumper
@@ -174,19 +269,19 @@ class DebugModule
     }
 
 
-    public function newThrowabler() : ThrowablerInterface
+    public function newThrowabler() : DebugThrowablerInterface
     {
-        $instance = new DefaultThrowabler();
+        $instance = new DefaultDebugThrowabler();
 
         return $instance;
     }
 
-    public function cloneThrowabler() : ThrowablerInterface
+    public function cloneThrowabler() : DebugThrowablerInterface
     {
         return clone $this->throwabler();
     }
 
-    public function throwabler(?ThrowablerInterface $throwabler = null) : ThrowablerInterface
+    public function throwabler(?DebugThrowablerInterface $throwabler = null) : DebugThrowablerInterface
     {
         return $this->throwabler = null
             ?? $throwabler
@@ -194,6 +289,24 @@ class DebugModule
             ?? $this->newThrowabler();
     }
 
+
+    public function debug_backtrace(
+        ?int $options = -1,
+        ?int $limit = -1
+    ) : DebugBacktracerInterface
+    {
+        $backtracer = $this->cloneBacktracer();
+
+        if ( (null === $options) || ($options >= 0) ) {
+            $backtracer->options($options);
+        }
+
+        if ( (null === $limit) || ($limit >= 0) ) {
+            $backtracer->limit($limit);
+        }
+
+        return $backtracer;
+    }
 
     /**
      * @return array{ file: string, line: int }|array{ 0: string, 1: int }
@@ -382,573 +495,187 @@ class DebugModule
     }
 
 
-    public function debug_backtrace(
-        ?int $options = -1,
-        ?int $limit = -1
-    ) : BacktracerInterface
-    {
-        $backtracer = $this->cloneBacktracer();
-
-        if ( (null === $options) || ($options >= 0) ) {
-            $backtracer->options($options);
-        }
-
-        if ( (null === $limit) || ($limit >= 0) ) {
-            $backtracer->limit($limit);
-        }
-
-        return $backtracer;
-    }
-
-
-    public function print(...$vars) : string
-    {
-        return $this->dumper()->printerPrint(...$vars);
-    }
-
-
-    public function dp($var, ...$vars) : string
-    {
-        $fileLine = Lib::file_line([], 1);
-
-        return $this->dumper()->dp($fileLine, $var, ...$vars);
-    }
-
-    public function fnDP(?int $traceShift = null, ?array $trace = null) : \Closure
-    {
-        return $this->dumper()->fnDP($traceShift, $trace);
-    }
-
-
     /**
-     * @return mixed
+     * @return string|float|int|null
      */
-    public function d($var, ...$vars)
+    public function var_export($var, ?array $options = null, ?int $level = null)
     {
-        $fileLine = Lib::file_line([], 1);
+        $options = $options ?? [];
+        $level = $level ?? 0;
 
-        return $this->dumper()->d($fileLine, $var, ...$vars);
-    }
-
-    /**
-     * @return mixed|void
-     */
-    public function dd(...$vars)
-    {
-        $fileLine = Lib::file_line([], 1);
-
-        return $this->dumper()->dd($fileLine, ...$vars);
-    }
-
-    public function fnD(?int $traceShift = null, ?array $trace = null) : \Closure
-    {
-        return $this->dumper()->fnD($traceShift, $trace);
-    }
-
-    public function fnDD(?int $traceShift = null, ?array $trace = null) : \Closure
-    {
-        return $this->dumper()->fnDD($traceShift, $trace);
-    }
-
-
-    /**
-     * @return mixed|void
-     */
-    public function td(int $throttleMs, $var, ...$vars)
-    {
-        $fileLine = Lib::file_line([], 1);
-
-        return $this->dumper()->td($fileLine, $throttleMs, $var, ...$vars);
-    }
-
-    public function fnTD(?int $traceShift = null, ?array $trace = null) : \Closure
-    {
-        return $this->dumper()->fnTd($traceShift, $trace);
-    }
-
-
-    /**
-     * @return mixed|void
-     */
-    public function zd(?int $zTimes, $var, ...$vars)
-    {
-        $fileLine = Lib::file_line([], 1);
-
-        return $this->dumper()->zd($fileLine, $zTimes, $var, ...$vars);
-    }
-
-    public function fnZD(?int $traceShift = null, ?array $trace = null) : \Closure
-    {
-        return $this->dumper()->fnZD($traceShift, $trace);
-    }
-
-
-    public function dump_type($value, array $options = [], array &$refContext = []) : string
-    {
-        $options = []
-            + [
-                'with_type'     => true,
-                'with_id'       => false,
-                'with_value'    => false,
-                'array_indent'  => '',
-                'array_newline' => ' ',
-            ]
-            + $options
-            + $this->stateVarDumpOptions()
-            + [
-                'array_level_max'  => 1,
-                'multiline_escape' => '###',
-                'with_braces'      => true,
-            ];
-
-        $output = $this->var_dump_output(
-            $value,
+        $options = $this->_var_export_options(
+            null,
             $options,
-            $refContext
+            null
         );
 
-        $content = '';
-        if ( array_key_exists('type', $output) ) {
-            $content .= $output['type'];
-        }
-        if ( array_key_exists('subtype', $output) ) {
-            $content .= '(' . $output['subtype'] . ')';
-        }
-        if ( array_key_exists('class', $output) ) {
-            $content .= ' # ' . $output['class'];
-        }
+        $optWithAddcslashes = $options[static::VAR_EXPORT_OPT_WITH_ADDCSLASHES];
+        $optIndent = $options[static::VAR_EXPORT_OPT_INDENT];
+        $optNewline = $options[static::VAR_EXPORT_OPT_NEWLINE];
 
-        $withBraces = null
-            ?? $options['with_braces']
+        $withAddcslashes = null
+            ?? $optWithAddcslashes
             ?? true;
 
-        if ( $withBraces ) {
-            $content = '{ ' . $content . ' }';
+        $indent = null
+            ?? $optIndent
+            ?? "  ";
+
+        $newline = null
+            ?? $optNewline
+            ?? "\n";
+
+        switch ( gettype($var) ) {
+            case "NULL":
+                $result = "NULL";
+
+                break;
+
+            case "boolean":
+                $result = ($var === true)
+                    ? "TRUE"
+                    : "FALSE";
+
+                break;
+
+            case "integer":
+            case "double":
+                $result = $var;
+
+                break;
+
+            case "string":
+                $result = $withAddcslashes
+                    ? addcslashes($var, "\\\$\"\r\n\t\v\f")
+                    : $var;
+
+                $result = "\"{$result}\"";
+
+                break;
+
+            case "array":
+                if ( [] === $var ) {
+                    $result = "[]";
+
+                } else {
+                    $isShort = (array_keys($var) === range(0, count($var) - 1));
+
+                    $lines = [];
+                    foreach ( $var as $key => $vvar ) {
+                        $rowIndent = str_repeat($indent, $level + 1);
+
+                        $keyString = '';
+                        if ( ! $isShort ) {
+                            $keyString = is_string($key)
+                                ? "\"{$key}\" => "
+                                : "{$key} => ";
+                        }
+
+                        if ( [] === $vvar ) {
+                            $vvarString = '[]';
+
+                        } else {
+                            // > ! recursion
+                            $vvarString = $this->var_export(
+                                $vvar,
+                                $options, $level + 1
+                            );
+                        }
+
+                        $line = ''
+                            . $rowIndent
+                            . $keyString
+                            . $vvarString;
+
+                        $lines[] = $line;
+                    }
+
+                    $arrayEndIndent = str_repeat($indent, $level);
+
+                    $result = implode("," . $newline, $lines);
+
+                    $result = implode($newline, [
+                        "[",
+                        $result,
+                        $arrayEndIndent . "]",
+                    ]);
+                }
+
+                break;
+
+            case "object":
+                if ( $var instanceof \stdClass ) {
+                    $vvar = get_object_vars($var);
+
+                    // > ! recursion
+                    $result = $this->var_export(
+                        $vvar,
+                        $options, $level,
+                    );
+
+                    $result = "(object) {$result}";
+
+                } else {
+                    $result = var_export($var, true);
+                }
+
+                break;
+
+            default:
+                $result = var_export($var, true);
+
+                break;
         }
 
-        return $content;
+        return $result;
     }
 
-    public function dump_type_id($value, array $options = [], array &$refContext = []) : string
-    {
-        $options = []
-            + [
-                'with_type'     => true,
-                'with_id'       => true,
-                'with_value'    => false,
-                'array_indent'  => '',
-                'array_newline' => ' ',
-            ]
-            + $options
-            + $this->stateVarDumpOptions()
-            + [
-                'array_level_max'  => 1,
-                'multiline_escape' => '###',
-                'with_braces'      => true,
-            ];
-
-        $output = $this->var_dump_output(
-            $value,
-            $options,
-            $refContext
-        );
-
-        $content = '';
-        if ( array_key_exists('type', $output) ) {
-            $content .= $output['type'];
-        }
-        if ( array_key_exists('subtype', $output) ) {
-            $content .= '(' . $output['subtype'] . ')';
-        }
-        if ( array_key_exists('class_id', $output) ) {
-            $content .= ' # ' . $output['class_id'];
-        }
-        if ( array_key_exists('id', $output) ) {
-            $content .= ' &' . $output['id'];
-        }
-
-        $withBraces = null
-            ?? $options['with_braces']
-            ?? true;
-
-        if ( $withBraces ) {
-            $content = '{ ' . $content . ' }';
-        }
-
-        return $content;
-    }
-
-
-    public function dump_type_value($value, array $options = [], array &$refContext = []) : string
-    {
-        $options = []
-            + [
-                'with_type'     => true,
-                'with_id'       => false,
-                'with_value'    => true,
-                'array_indent'  => '',
-                'array_newline' => ' ',
-            ]
-            + $options
-            + $this->stateVarDumpOptions()
-            + [
-                'array_level_max'  => 1,
-                'multiline_escape' => '###',
-                'with_braces'      => true,
-            ];
-
-        $output = $this->var_dump_output(
-            $value,
-            $options,
-            $refContext
-        );
-
-        $content = '';
-        if ( array_key_exists('type', $output) ) {
-            $content .= $output['type'];
-        }
-        if ( array_key_exists('subtype', $output) ) {
-            $content .= '(' . $output['subtype'] . ')';
-        }
-        if ( array_key_exists('class', $output) ) {
-            $content .= ' # ' . $output['class'];
-        }
-        if ( array_key_exists('value', $output) ) {
-            $content .= ' # ' . $output['value'];
-        }
-
-        $withBraces = null
-            ?? $options['with_braces']
-            ?? true;
-
-        if ( $withBraces ) {
-            $content = '{ ' . $content . ' }';
-        }
-
-        return $content;
-    }
-
-    public function dump_type_value_multiline($value, array $options = [], array &$refContext = []) : string
-    {
-        $options = []
-            + [
-                'with_type'     => true,
-                'with_id'       => false,
-                'with_value'    => true,
-                'array_indent'  => '  ',
-                'array_newline' => "\n",
-            ]
-            + $options
-            + $this->stateVarDumpOptions()
-            + [
-                'array_level_max'  => 0,
-                'multiline_escape' => '###',
-                'with_braces'      => true,
-            ];
-
-        $output = $this->var_dump_output(
-            $value,
-            $options,
-            $refContext
-        );
-
-        $printableType = '';
-        if ( array_key_exists('type', $output) ) {
-            $printableType .= $output['type'];
-        }
-        if ( array_key_exists('subtype', $output) ) {
-            $printableType .= '(' . $output['subtype'] . ')';
-        }
-        if ( array_key_exists('class', $output) ) {
-            $printableType .= ' # ' . $output['class'];
-        }
-
-        $printableValue = '';
-        if ( array_key_exists('value', $output) ) {
-            $printableValue .= $output['value'];
-        }
-
-        $withBraces = null
-            ?? $options['with_braces']
-            ?? false;
-
-        if ( $withBraces ) {
-            $printableType = '{ ' . $printableType . ' }';
-        }
-
-        $content = ''
-            . $options['multiline_escape'] . "\n"
-            . $printableType . "\n"
-            . $printableValue . "\n"
-            . $options['multiline_escape'];
-
-        return $content;
-    }
-
-
-    public function dump_value($value, array $options = [], array &$refContext = []) : string
-    {
-        $options = []
-            + [
-                'with_type'     => false,
-                'with_id'       => false,
-                'with_value'    => true,
-                'array_indent'  => '',
-                'array_newline' => ' ',
-            ]
-            + $options
-            + $this->stateVarDumpOptions()
-            + [
-                'array_level_max'  => 0,
-                'multiline_escape' => '###',
-                'with_braces'      => null,
-            ];
-
-        $output = $this->var_dump_output(
-            $value,
-            $options,
-            $refContext
-        );
-
-        $hasValue = array_key_exists('value', $output);
-
-        $isObject = is_object($value);
-        $isResource = is_resource($value) || ('resource (closed)' === gettype($value));
-
-        $content = '';
-        if ( $isObject || $isResource ) {
-            $forceBraces = true;
-
-            if ( array_key_exists('type', $output) ) {
-                $content .= $output['type'];
-            }
-            if ( array_key_exists('subtype', $output) ) {
-                $content .= '(' . $output['subtype'] . ')';
-            }
-            if ( array_key_exists('class', $output) ) {
-                $content .= ' # ' . $output['class'];
-            }
-            if ( array_key_exists('value', $output) ) {
-                $content .= ' # ' . $output['value'];
-            }
-
-        } elseif ( $hasValue ) {
-            $content .= $output['value'];
-
-        } else {
-            $forceBraces = true;
-
-            if ( array_key_exists('type', $output) ) {
-                $content .= $output['type'];
-            }
-            if ( array_key_exists('subtype', $output) ) {
-                $content .= '(' . $output['subtype'] . ')';
-            }
-            if ( array_key_exists('class', $output) ) {
-                $content .= ' # ' . $output['class'];
-            }
-        }
-
-        $withBraces = null
-            ?? $options['with_braces']
-            ?? $forceBraces
-            ?? false;
-
-        if ( $withBraces ) {
-            $content = '{ ' . $content . ' }';
-        }
-
-        return $content;
-    }
-
-    public function dump_value_multiline($value, array $options = [], array &$refContext = []) : string
-    {
-        $options = []
-            + [
-                'with_type'     => false,
-                'with_id'       => false,
-                'with_value'    => true,
-                'array_indent'  => '  ',
-                'array_newline' => "\n",
-            ]
-            + $options
-            + $this->stateVarDumpOptions()
-            + [
-                'array_level_max'  => 0,
-                'multiline_escape' => '###',
-                'with_braces'      => null,
-            ];
-
-        $output = $this->var_dump_output(
-            $value,
-            $options,
-            $refContext
-        );
-
-        $hasValue = array_key_exists('value', $output);
-
-        $isObject = is_object($value);
-        $isResource = is_resource($value) || ('resource (closed)' === gettype($value));
-
-        $content = '';
-        if ( $isObject || $isResource ) {
-            $forceBraces = true;
-
-            if ( array_key_exists('type', $output) ) {
-                $content .= $output['type'];
-            }
-            if ( array_key_exists('subtype', $output) ) {
-                $content .= '(' . $output['subtype'] . ')';
-            }
-            if ( array_key_exists('class', $output) ) {
-                $content .= ' # ' . $output['class'];
-            }
-            if ( array_key_exists('value', $output) ) {
-                $content .= ' # ' . $output['value'];
-            }
-
-        } elseif ( $hasValue ) {
-            $content .= $output['value'];
-
-        } else {
-            $forceBraces = true;
-
-            if ( array_key_exists('type', $output) ) {
-                $content .= $output['type'];
-            }
-            if ( array_key_exists('subtype', $output) ) {
-                $content .= '(' . $output['subtype'] . ')';
-            }
-            if ( array_key_exists('class', $output) ) {
-                $content .= ' # ' . $output['class'];
-            }
-        }
-
-        $withBraces = null
-            ?? $options['with_braces']
-            ?? $forceBraces
-            ?? false;
-
-        $printableType = $content;
-        if ( $withBraces ) {
-            $printableType = '{ ' . $content . ' }';
-        }
-
-        $content = ''
-            . $options['multiline_escape'] . "\n"
-            . $printableType . "\n"
-            . $options['multiline_escape'];
-
-        return $content;
-    }
-
-
-    public function dump_value_array($value, ?int $levelMax = null, array $options = [], array &$refContext = []) : string
-    {
-        $levelMax = $levelMax ?? 1;
-        if ( $levelMax < 0 ) $levelMax = 0;
-
-        $options['array_level_max'] = $levelMax;
-
-        $content = $this->dump_value($value, $options, $refContext);
-
-        return $content;
-    }
-
-    public function dump_value_array_multiline($value, ?int $levelMax = null, array $options = [], array &$refContext = []) : string
-    {
-        $levelMax = $levelMax ?? 1;
-        if ( $levelMax < 0 ) $levelMax = 0;
-
-        $options['array_level_max'] = $levelMax;
-
-        $content = $this->dump_value_multiline($value, $options, $refContext);
-
-        return $content;
-    }
-
-
-    public function dump_types(array $options = [], ?string $delimiter = null, ...$values) : string
+    protected function _var_export_options(
+        ?array $optionsForce = null,
+        ?array $options = null,
+        ?array $optionsDefault = null
+    ) : array
     {
         $theType = Lib::type();
 
-        $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
+        $optionsTotal = []
+            + ($optionsForce ?? [])
+            + ($options ?? [])
+            + ($optionsDefault ?? [])
+            + $this->stateVarExportOptionsDefault();
 
-        $list = [];
-        foreach ( $values as $value ) {
-            $list[] = $this->dump_type($value, $options);
-        }
+        if ( null !== ($var =& $optionsTotal[static::VAR_EXPORT_OPT_WITH_ADDCSLASHES]) ) $var = $theType->bool($var)->orThrow();
+        if ( null !== ($var =& $optionsTotal[static::VAR_EXPORT_OPT_INDENT]) ) $var = $theType->string($var)->orThrow();
+        if ( null !== ($var =& $optionsTotal[static::VAR_EXPORT_OPT_NEWLINE]) ) $var = $theType->string($var)->orThrow();
 
-        $content = implode($delimiterString, $list);
-
-        return $content;
-    }
-
-    public function dump_type_ids(array $options = [], ?string $delimiter = null, ...$values) : string
-    {
-        $theType = Lib::type();
-
-        $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
-
-        $list = [];
-        foreach ( $values as $value ) {
-            $list[] = $this->dump_type_id($value, $options);
-        }
-
-        $content = implode($delimiterString, $list);
-
-        return $content;
-    }
-
-    public function dump_type_values(array $options = [], ?string $delimiter = null, ...$values) : string
-    {
-        $theType = Lib::type();
-
-        $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
-
-        $list = [];
-        foreach ( $values as $value ) {
-            $list[] = $this->dump_type_value($value, $options);
-        }
-
-        $content = implode($delimiterString, $list);
-
-        return $content;
+        return $optionsTotal;
     }
 
 
-    public function dump_values(array $options = [], ?string $delimiter = null, ...$values) : string
+    public function var_dump($var, ?array $options = null, ?array &$refContext = null) : string
     {
-        $theType = Lib::type();
+        $options = $options ?? [];
+        $refContext = $refContext ?? [];
 
-        $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
+        $options = $this->_var_dump_options(
+            null,
+            $options,
+            [
+                static::VAR_DUMP_OPT_ARRAY_INDENT     => '',
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 1,
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE    => ' ',
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => null,
+                static::VAR_DUMP_OPT_WITH_ID          => true,
+                static::VAR_DUMP_OPT_WITH_TYPE        => true,
+                static::VAR_DUMP_OPT_WITH_VALUE       => true,
+            ]
+        );
 
-        $list = [];
-        foreach ( $values as $value ) {
-            $list[] = $this->dump_value($value, $options);
-        }
-
-        $content = implode($delimiterString, $list);
-
-        return $content;
-    }
-
-
-    public function var_dump($var, array $options = [], array &$refContext = []) : string
-    {
-        $options = []
-            + $options
-            + $this->stateVarDumpOptions()
-            + [
-                'with_type'        => true,
-                'with_id'          => true,
-                'with_value'       => true,
-                'with_braces'      => null,
-                'array_level_max'  => 1,
-                'array_indent'     => '',
-                'array_newline'    => ' ',
-                'multiline_escape' => '###',
-            ];
+        $optWithType = $options[static::VAR_DUMP_OPT_WITH_TYPE];
+        $optWithId = $options[static::VAR_DUMP_OPT_WITH_ID];
+        $optWithValue = $options[static::VAR_DUMP_OPT_WITH_VALUE];
+        $optWithBraces = $options[static::VAR_DUMP_OPT_WITH_BRACES];
 
         $output = $this->var_dump_output(
             $var,
@@ -956,9 +683,9 @@ class DebugModule
             $refContext
         );
 
-        $withType = $options['with_type'];
-        $withId = $options['with_id'];
-        $withValue = $options['with_value'];
+        $content = [];
+
+        $forceBraces = false;
 
         $printableType = '';
         if ( array_key_exists('type', $output) ) {
@@ -967,40 +694,56 @@ class DebugModule
         if ( array_key_exists('subtype', $output) ) {
             $printableType .= '(' . $output['subtype'] . ')';
         }
+
+        $withId = null
+            ?? $optWithId
+            ?? false;
+
         if ( $withId ) {
-            if ( array_key_exists('class_id', $output) ) {
-                $printableType .= ' # ' . $output['class_id'];
+            if ( array_key_exists('class_original', $output) ) {
+                $printableType .= ' # ' . $output['class_original'];
             }
             if ( array_key_exists('id', $output) ) {
                 $printableType .= ' @' . $output['id'];
             }
+
         } else {
             if ( array_key_exists('class', $output) ) {
                 $printableType .= ' # ' . $output['class'];
             }
         }
 
-        $content = [];
+        $withType = null
+            ?? $optWithType
+            ?? false;
+
         if ( $withType ) {
             $content[] = $printableType;
         }
+
+        $withValue = null
+            ?? $optWithValue
+            ?? true;
+
         if ( $withValue ) {
             if ( array_key_exists('value', $output) ) {
                 $content[] = $output['value'];
 
-            } elseif ( ! $withType ) {
-                $forceBraces = true;
+            } else {
+                if ( ! $optWithType ) {
+                    $forceBraces = true;
 
-                $content[] = $printableType;
+                    $content[] = $printableType;
+                }
             }
         }
 
         $content = implode(' # ', $content);
 
         $withBraces = null
-            ?? $options['with_braces']
-            ?? ($withId ? true : null)
-            ?? ($withType ? true : null)
+            ?? $optWithBraces
+            ?? ($optWithId ? true : null) // > only if true
+            ?? ($optWithType ? true : null) // > only if true
             ?? $forceBraces
             ?? false;
 
@@ -1011,7 +754,34 @@ class DebugModule
         return $content;
     }
 
-    protected function var_dump_output($var, array $options = [], array &$refContext = []) : array
+    protected function _var_dump_options(
+        ?array $optionsForce = null,
+        ?array $options = null,
+        ?array $optionsDefault = null
+    ) : array
+    {
+        $theType = Lib::type();
+
+        $optionsTotal = []
+            + ($optionsForce ?? [])
+            + ($options ?? [])
+            + ($optionsDefault ?? [])
+            + $this->stateVarDumpOptionsDefault();
+
+        if ( null !== ($var =& $optionsTotal[static::VAR_DUMP_OPT_ARRAY_INDENT]) ) $var = $theType->string($var)->orThrow();
+        if ( null !== ($var =& $optionsTotal[static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX]) ) $var = $theType->int_non_negative($var)->orThrow();
+        if ( null !== ($var =& $optionsTotal[static::VAR_DUMP_OPT_ARRAY_NEWLINE]) ) $var = $theType->string($var)->orThrow();
+        if ( null !== ($var =& $optionsTotal[static::VAR_DUMP_OPT_MULTILINE_ESCAPE]) ) $var = $theType->string($var)->orThrow();
+        if ( null !== ($var =& $optionsTotal[static::VAR_DUMP_OPT_WITH_BRACES]) ) $var = $theType->bool($var)->orThrow();
+        if ( null !== ($var =& $optionsTotal[static::VAR_DUMP_OPT_WITH_ID]) ) $var = $theType->bool($var)->orThrow();
+        if ( null !== ($var =& $optionsTotal[static::VAR_DUMP_OPT_WITH_TYPE]) ) $var = $theType->bool($var)->orThrow();
+        if ( null !== ($var =& $optionsTotal[static::VAR_DUMP_OPT_WITH_VALUE]) ) $var = $theType->bool($var)->orThrow();
+
+        return $optionsTotal;
+    }
+
+
+    protected function var_dump_output($var, array $options = [], ?array &$refContext = []) : array
     {
         $output = null
             ?? $this->var_dump_output_null($var, $options, $refContext)
@@ -1084,12 +854,17 @@ class DebugModule
 
         $theStr = Lib::str();
 
-        $withValue = $options['with_value'] ?? true;
+        $optWithValue = $options[static::VAR_DUMP_OPT_WITH_VALUE];
 
         $phpType = gettype($var);
         $phpStrlen = strlen($var);
 
         $printableValue = [];
+
+        $withValue = null
+            ?? $optWithValue
+            ?? true;
+
         if ( $withValue ) {
             $printableValue = str_replace('"', '\"', $var);
             $printableValue = $theStr->dump_encode($printableValue);
@@ -1115,12 +890,12 @@ class DebugModule
 
         $theDate = Lib::date();
 
+        $optWithValue = $options[static::VAR_DUMP_OPT_WITH_VALUE];
+
         $phpType = gettype($var);
 
-        $withValue = $options['with_value'] ?? false;
-
-        $objectClassId = get_class($var);
-        $objectClass = $objectClassId;
+        $objectClassOriginal = get_class($var);
+        $objectClass = $objectClassOriginal;
         $objectId = spl_object_id($var);
 
         if ( false !== ($pos = strpos($objectClass, $needle = '@anonymous')) ) {
@@ -1139,6 +914,10 @@ class DebugModule
         if ( $objectSubtypeIterable ) $objectSubtype[] = $objectSubtypeIterable;
         if ( $objectSubtypeSerializable ) $objectSubtype[] = $objectSubtypeSerializable;
         if ( $objectSubtypeStringable ) $objectSubtype[] = $objectSubtypeStringable;
+
+        $withValue = null
+            ?? $optWithValue
+            ?? false;
 
         $printableValue = [];
         if ( $withValue ) {
@@ -1163,8 +942,8 @@ class DebugModule
 
             $output['subtype'] = $objectSubtype;
         }
+        $output['class_original'] = $objectClassOriginal;
         $output['class'] = $objectClass;
-        $output['class_id'] = $objectClassId;
         $output['id'] = $objectId;
 
         if ( $withValue ) {
@@ -1183,19 +962,26 @@ class DebugModule
         $theArr = Lib::arr();
         $theType = Lib::type();
 
-        $withValue = $options['with_value'] ?? true;
+        $optWithValue = $options[static::VAR_DUMP_OPT_WITH_VALUE];
 
-        $arrayLevelMax = $options['array_level_max'] ?? null;
-        $arrayIndent = $options['array_indent'] ?? null;
-        $arrayNewline = $options['array_newline'] ?? null;
+        $optArrayIndent = $options[static::VAR_DUMP_OPT_ARRAY_INDENT];
+        $optArrayLevelMax = $options[static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX];
+        $optArrayNewline = $options[static::VAR_DUMP_OPT_ARRAY_NEWLINE];
 
+        $arrayLevelMax = $optArrayLevelMax ?? 0;
         $arrayLevelMax = (int) $arrayLevelMax;
-        if ( $arrayLevelMax < 0 ) $arrayLevelMax = 0;
+        if ( $arrayLevelMax < 0 ) {
+            $arrayLevelMax = 0;
+        }
 
         $phpType = gettype($var);
 
         $arrayCopy = $var;
         $arrayCount = count($var);
+
+        $withValue = null
+            ?? $optWithValue
+            ?? true;
 
         $printableValue = [];
         if ( $withValue ) {
@@ -1209,14 +995,20 @@ class DebugModule
                     || $theType->object($value)->isOk()
                     || $theType->resource($value)->isOk()
                 ) {
+                    $optionsCurrent = []
+                        + [
+                            static::VAR_DUMP_OPT_WITH_TYPE       => true,
+                            static::VAR_DUMP_OPT_WITH_ID         => false,
+                            static::VAR_DUMP_OPT_WITH_VALUE      => false,
+                            //
+                            static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX => 0,
+                        ]
+                        + $options;
+
                     // > ! recursion
                     $value = $this->var_dump(
                         $value,
-                        [
-                            'with_type'  => true,
-                            'with_id'    => false,
-                            'with_value' => false,
-                        ] + $options
+                        $optionsCurrent
                     );
 
                     continue;
@@ -1226,14 +1018,20 @@ class DebugModule
 
                 if ( $shouldVarDumpInsteadOfVarExport ) {
                     if ( is_string($value) ) {
+                        $optionsCurrent = []
+                            + [
+                                static::VAR_DUMP_OPT_WITH_TYPE       => false,
+                                static::VAR_DUMP_OPT_WITH_ID         => false,
+                                static::VAR_DUMP_OPT_WITH_VALUE      => true,
+                                //
+                                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX => 0,
+                            ]
+                            + $options;
+
                         // > ! recursion
                         $value = $this->var_dump(
                             $value,
-                            [
-                                'with_type'  => false,
-                                'with_id'    => false,
-                                'with_value' => true,
-                            ] + $options
+                            $optionsCurrent
                         );
 
                         $value = substr($value, 1, -1);
@@ -1243,16 +1041,20 @@ class DebugModule
 
                     if ( is_array($value) ) {
                         if ( [] !== $value ) {
+                            $optionsCurrent = []
+                                + [
+                                    static::VAR_DUMP_OPT_WITH_TYPE       => true,
+                                    static::VAR_DUMP_OPT_WITH_ID         => false,
+                                    static::VAR_DUMP_OPT_WITH_VALUE      => false,
+                                    //
+                                    static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX => 0,
+                                ]
+                                + $options;
+
                             // > ! recursion
                             $value = $this->var_dump(
                                 $value,
-                                [
-                                    'with_type'       => true,
-                                    'with_id'         => false,
-                                    'with_value'      => false,
-                                    //
-                                    'array_level_max' => 0,
-                                ] + $options
+                                $optionsCurrent
                             );
                         }
 
@@ -1265,9 +1067,9 @@ class DebugModule
             $printableValue = $this->var_export(
                 $arrayCopy,
                 [
-                    'addcslashes' => false,
-                    'indent'      => $arrayIndent,
-                    'newline'     => $arrayNewline,
+                    static::VAR_EXPORT_OPT_WITH_ADDCSLASHES => false,
+                    static::VAR_EXPORT_OPT_INDENT           => $optArrayIndent,
+                    static::VAR_EXPORT_OPT_NEWLINE          => $optArrayNewline,
                 ]
             );
 
@@ -1294,13 +1096,17 @@ class DebugModule
             return null;
         }
 
-        $withValue = $options['with_value'] ?? true;
+        $optWithValue = $options[static::VAR_DUMP_OPT_WITH_VALUE];
 
         $phpType = 'resource';
 
         $resourceType = $isResourceOpened
             ? 'opened'
             : 'closed';
+
+        $withValue = null
+            ?? $optWithValue
+            ?? true;
 
         $printableValue = [];
         if ( $withValue ) {
@@ -1309,7 +1115,7 @@ class DebugModule
                 : [];
         }
 
-        $resourceId = PHP_VERSION_ID > 80000
+        $resourceId = (PHP_VERSION_ID > 80000)
             ? get_resource_id($var)
             : (int) $var;
 
@@ -1328,120 +1134,949 @@ class DebugModule
     }
 
 
-    /**
-     * @return string|float|int|null
-     */
-    public function var_export($var, array $options = [], ?int $level = null)
+    public function print_type($value, ?array $options = null, ?array &$refContext = null) : string
     {
-        $level = $level ?? 0;
+        $options = $options ?? [];
+        $refContext = $refContext ?? [];
+
+        $options = $this->_var_dump_options(
+            [
+                static::VAR_DUMP_OPT_WITH_TYPE     => true,
+                static::VAR_DUMP_OPT_WITH_ID       => false,
+                static::VAR_DUMP_OPT_WITH_VALUE    => false,
+                static::VAR_DUMP_OPT_ARRAY_INDENT  => '',
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE => ' ',
+            ],
+            $options,
+            [
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 0,
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => true,
+            ]
+        );
+
+        $optWithBraces = $options[static::VAR_DUMP_OPT_WITH_BRACES];
+
+        $output = $this->var_dump_output(
+            $value,
+            $options,
+            $refContext
+        );
+
+        $printableType = '';
+        if ( array_key_exists('type', $output) ) {
+            $printableType .= $output['type'];
+        }
+        if ( array_key_exists('subtype', $output) ) {
+            $printableType .= '(' . $output['subtype'] . ')';
+        }
+        if ( array_key_exists('class', $output) ) {
+            $printableType .= ' # ' . $output['class'];
+        }
+
+        $withBraces = null
+            ?? $optWithBraces
+            ?? true;
+
+        if ( $withBraces ) {
+            $printableType = '{ ' . $printableType . ' }';
+        }
+
+        $content = $printableType;
+
+        return $content;
+    }
+
+    public function print_all_type(array $values, ?string $delimiter = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $delimiter = $delimiter ?? ' | ';
 
         $theType = Lib::type();
 
-        $addcslashes = $options['addcslashes'] ?? true;
-        $indent = $options['indent'] ?? "  ";
-        $newline = $options['newline'] ?? "\n";
+        $delimiterString = $theType->string_not_empty($delimiter)->orThrow();
 
-        $indent = (string) $indent;
-        $newline = (string) $newline;
-
-        switch ( gettype($var) ) {
-            case "NULL":
-                $result = "NULL";
-                break;
-
-            case "boolean":
-                $result = ($var === true) ? "TRUE" : "FALSE";
-                break;
-
-            case "integer":
-            case "double":
-                $result = $var;
-                break;
-
-            case "string":
-                $result = $addcslashes
-                    ? addcslashes($var, "\\\$\"\r\n\t\v\f")
-                    : $var;
-
-                $result = "\"{$result}\"";
-
-                break;
-
-            case "array":
-                if ( [] === $var ) {
-                    $result = "[]";
-
-                } else {
-                    $isShort = (array_keys($var) === range(0, count($var) - 1));
-
-                    $lines = [];
-                    foreach ( $var as $key => $value ) {
-                        $rowIndent = str_repeat($indent, $level + 1);
-
-                        $keyString = '';
-                        if ( ! $isShort ) {
-                            $keyString = is_string($key)
-                                ? "\"{$key}\" => "
-                                : "{$key} => ";
-                        }
-
-                        if ( [] === $value ) {
-                            $valueString = '[]';
-
-                        } else {
-                            // > ! recursion
-                            $valueString = $this->var_export(
-                                $value,
-                                $options,
-                                $level + 1
-                            );
-                        }
-
-                        $line = ''
-                            . $rowIndent
-                            . $keyString
-                            . $valueString;
-
-                        $lines[] = $line;
-                    }
-
-                    $arrayEndIndent = '';
-                    if ( $level > 0 ) {
-                        $arrayEndIndent = str_repeat($indent, $level);
-                    }
-
-                    $result = ""
-                        . "[" . $newline
-                        . implode("," . $newline, $lines) . $newline
-                        . $arrayEndIndent
-                        . "]";
-                }
-
-                break;
-
-            case "object":
-                if ( $var instanceof \stdClass ) {
-                    $result = ''
-                        . '(object) '
-                        . $this->var_export(
-                            get_object_vars($var),
-                            $options,
-                            $level,
-                        );
-
-                } else {
-                    $result = var_export($var, true);
-                }
-
-                break;
-
-            default:
-                $result = var_export($var, true);
-
-                break;
+        $list = [];
+        foreach ( $values as $value ) {
+            $list[] = $this->print_type($value, $options, $refContext);
         }
 
-        return $result;
+        $content = implode($delimiterString, $list);
+
+        return $content;
+    }
+
+
+    public function print_type_id($value, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $options = $options ?? [];
+        $refContext = $refContext ?? [];
+
+        $options = $this->_var_dump_options(
+            [
+                static::VAR_DUMP_OPT_WITH_TYPE     => true,
+                static::VAR_DUMP_OPT_WITH_ID       => true,
+                static::VAR_DUMP_OPT_WITH_VALUE    => false,
+                static::VAR_DUMP_OPT_ARRAY_INDENT  => '',
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE => ' ',
+            ],
+            $options,
+            [
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 0,
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => true,
+            ]
+        );
+
+        $optWithBraces = $options[static::VAR_DUMP_OPT_WITH_BRACES];
+
+        $output = $this->var_dump_output(
+            $value,
+            $options,
+            $refContext
+        );
+
+        $printableType = '';
+        if ( array_key_exists('type', $output) ) {
+            $printableType .= $output['type'];
+        }
+        if ( array_key_exists('subtype', $output) ) {
+            $printableType .= '(' . $output['subtype'] . ')';
+        }
+        if ( array_key_exists('class_original', $output) ) {
+            $printableType .= ' # ' . $output['class_original'];
+        }
+        if ( array_key_exists('id', $output) ) {
+            $printableType .= ' &' . $output['id'];
+        }
+
+        $withBraces = null
+            ?? $optWithBraces
+            ?? true;
+
+        if ( $withBraces ) {
+            $printableType = '{ ' . $printableType . ' }';
+        }
+
+        $content = $printableType;
+
+        return $content;
+    }
+
+    public function print_all_type_id(array $values, ?string $delimiter = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $delimiter = $delimiter ?? ' | ';
+
+        $theType = Lib::type();
+
+        $delimiterString = $theType->string_not_empty($delimiter)->orThrow();
+
+        $list = [];
+        foreach ( $values as $value ) {
+            $list[] = $this->print_type_id($value, $options, $refContext);
+        }
+
+        $content = implode($delimiterString, $list);
+
+        return $content;
+    }
+
+
+    public function print_value($value, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $options = $options ?? [];
+        $refContext = $refContext ?? [];
+
+        $options = $this->_var_dump_options(
+            [
+                static::VAR_DUMP_OPT_WITH_TYPE     => false,
+                static::VAR_DUMP_OPT_WITH_ID       => false,
+                static::VAR_DUMP_OPT_WITH_VALUE    => true,
+                static::VAR_DUMP_OPT_ARRAY_INDENT  => '',
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE => ' ',
+            ],
+            $options,
+            [
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 0,
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => null,
+            ]
+        );
+
+        $optWithBraces = $options[static::VAR_DUMP_OPT_WITH_BRACES];
+
+        $output = $this->var_dump_output(
+            $value,
+            $options,
+            $refContext
+        );
+
+        $forceBraces = false;
+
+        $hasValue = array_key_exists('value', $output);
+
+        $isObject = is_object($value);
+        $isResource = is_resource($value) || ('resource (closed)' === gettype($value));
+
+        $printableType = '';
+        $printableValue = '';
+
+        if ( false
+            || ($isObject || $isResource)
+            || (! $hasValue)
+        ) {
+            $forceBraces = true;
+
+            if ( array_key_exists('type', $output) ) {
+                $printableType .= $output['type'];
+            }
+            if ( array_key_exists('subtype', $output) ) {
+                $printableType .= '(' . $output['subtype'] . ')';
+            }
+            if ( array_key_exists('class', $output) ) {
+                $printableType .= ' # ' . $output['class'];
+            }
+        }
+
+        if ( $hasValue ) {
+            $printableValue = $output['value'];
+        }
+
+        $withBraces = null
+            ?? $optWithBraces
+            ?? $forceBraces
+            ?? false;
+
+        $content = [];
+        if ( '' !== $printableType ) $content[] = $printableType;
+        if ( '' !== $printableValue ) $content[] = $printableValue;
+        $content = implode(' # ', $content);
+
+        if ( $withBraces ) {
+            $content = '{ ' . $content . ' }';
+        }
+
+        return $content;
+    }
+
+    public function print_all_value(array $values, ?string $delimiter = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $delimiter = $delimiter ?? ' | ';
+
+        $theType = Lib::type();
+
+        $delimiterString = $theType->string_not_empty($delimiter)->orThrow();
+
+        $list = [];
+        foreach ( $values as $value ) {
+            $list[] = $this->print_value($value, $options, $refContext);
+        }
+
+        $content = implode($delimiterString, $list);
+
+        return $content;
+    }
+
+
+    public function print_type_value($value, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $options = $options ?? [];
+        $refContext = $refContext ?? [];
+
+        $options = $this->_var_dump_options(
+            [
+                static::VAR_DUMP_OPT_WITH_TYPE     => true,
+                static::VAR_DUMP_OPT_WITH_ID       => false,
+                static::VAR_DUMP_OPT_WITH_VALUE    => true,
+                static::VAR_DUMP_OPT_ARRAY_INDENT  => '',
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE => ' ',
+            ],
+            $options,
+            [
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 0,
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => true,
+            ]
+        );
+
+        $optWithBraces = $options[static::VAR_DUMP_OPT_WITH_BRACES];
+
+        $output = $this->var_dump_output(
+            $value,
+            $options,
+            $refContext
+        );
+
+        $forceBraces = false;
+
+        $printableType = '';
+        $printableValue = '';
+
+        if ( array_key_exists('type', $output) ) {
+            $printableType .= $output['type'];
+        }
+        if ( array_key_exists('subtype', $output) ) {
+            $printableType .= '(' . $output['subtype'] . ')';
+        }
+        if ( array_key_exists('class', $output) ) {
+            $printableType .= ' # ' . $output['class'];
+        }
+
+        if ( array_key_exists('value', $output) ) {
+            $printableValue = $output['value'];
+        }
+
+        $withBraces = null
+            ?? $optWithBraces
+            ?? $forceBraces
+            ?? false;
+
+        $content = [];
+        if ( '' !== $printableType ) $content[] = $printableType;
+        if ( '' !== $printableValue ) $content[] = $printableValue;
+        $content = implode(' # ', $content);
+
+        if ( $withBraces ) {
+            $content = '{ ' . $content . ' }';
+        }
+
+        return $content;
+    }
+
+    public function print_all_type_value(array $values, ?string $delimiter = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $delimiter = $delimiter ?? ' | ';
+
+        $theType = Lib::type();
+
+        $delimiterString = $theType->string_not_empty($delimiter)->orThrow();
+
+        $list = [];
+        foreach ( $values as $value ) {
+            $list[] = $this->print_type_value($value, $options, $refContext);
+        }
+
+        $content = implode($delimiterString, $list);
+
+        return $content;
+    }
+
+
+    public function print_type_id_value($value, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $options = $options ?? [];
+        $refContext = $refContext ?? [];
+
+        $options = $this->_var_dump_options(
+            [
+                static::VAR_DUMP_OPT_WITH_TYPE     => true,
+                static::VAR_DUMP_OPT_WITH_ID       => true,
+                static::VAR_DUMP_OPT_WITH_VALUE    => true,
+                static::VAR_DUMP_OPT_ARRAY_INDENT  => '',
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE => ' ',
+            ],
+            $options,
+            [
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 0,
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => true,
+            ]
+        );
+
+        $optWithBraces = $options[static::VAR_DUMP_OPT_WITH_BRACES];
+
+        $output = $this->var_dump_output(
+            $value,
+            $options,
+            $refContext
+        );
+
+        $forceBraces = false;
+
+        $printableType = '';
+        $printableValue = '';
+
+        if ( array_key_exists('type', $output) ) {
+            $printableType .= $output['type'];
+        }
+        if ( array_key_exists('subtype', $output) ) {
+            $printableType .= '(' . $output['subtype'] . ')';
+        }
+        if ( array_key_exists('class_original', $output) ) {
+            $printableType .= ' # ' . $output['class_original'];
+        }
+        if ( array_key_exists('id', $output) ) {
+            $printableType .= ' &' . $output['id'];
+        }
+
+        if ( array_key_exists('value', $output) ) {
+            $printableValue = $output['value'];
+        }
+
+        $withBraces = null
+            ?? $optWithBraces
+            ?? $forceBraces
+            ?? false;
+
+        $content = [];
+        if ( '' !== $printableType ) $content[] = $printableType;
+        if ( '' !== $printableValue ) $content[] = $printableValue;
+        $content = implode(' # ', $content);
+
+        if ( $withBraces ) {
+            $content = '{ ' . $content . ' }';
+        }
+
+        return $content;
+    }
+
+    public function print_all_type_id_value(array $values, ?string $delimiter = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $delimiter = $delimiter ?? ' | ';
+
+        $theType = Lib::type();
+
+        $delimiterString = $theType->string_not_empty($delimiter)->orThrow();
+
+        $list = [];
+        foreach ( $values as $value ) {
+            $list[] = $this->print_type_id_value($value, $options, $refContext);
+        }
+
+        $content = implode($delimiterString, $list);
+
+        return $content;
+    }
+
+
+    public function print_value_multiline($value, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $options = $options ?? [];
+        $refContext = $refContext ?? [];
+
+        $options = $this->_var_dump_options(
+            [
+                static::VAR_DUMP_OPT_WITH_TYPE     => false,
+                static::VAR_DUMP_OPT_WITH_ID       => false,
+                static::VAR_DUMP_OPT_WITH_VALUE    => true,
+                static::VAR_DUMP_OPT_ARRAY_INDENT  => '  ',
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE => "\n",
+            ],
+            $options,
+            [
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 0,
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => null,
+            ]
+        );
+
+        $optWithBraces = $options[static::VAR_DUMP_OPT_WITH_BRACES];
+        $optMultilineEscape = $options[static::VAR_DUMP_OPT_MULTILINE_ESCAPE];
+
+        $output = $this->var_dump_output(
+            $value,
+            $options,
+            $refContext
+        );
+
+        $forceBraces = false;
+
+        $hasValue = array_key_exists('value', $output);
+
+        $isObject = is_object($value);
+        $isResource = is_resource($value) || ('resource (closed)' === gettype($value));
+
+        $printableType = '';
+        $printableValue = '';
+
+        if ( false
+            || ($isObject || $isResource)
+            || (! $hasValue)
+        ) {
+            $forceBraces = true;
+
+            if ( array_key_exists('type', $output) ) {
+                $printableType .= $output['type'];
+            }
+            if ( array_key_exists('subtype', $output) ) {
+                $printableType .= '(' . $output['subtype'] . ')';
+            }
+            if ( array_key_exists('class', $output) ) {
+                $printableType .= ' # ' . $output['class'];
+            }
+        }
+
+        if ( $hasValue ) {
+            $printableValue = $output['value'];
+        }
+
+        $withBraces = null
+            ?? $optWithBraces
+            ?? $forceBraces
+            ?? false;
+
+        if ( $withBraces ) {
+            $printableType = '{ ' . $printableType . ' }';
+        }
+
+        $content = [];
+        if ( '' !== $printableType ) $content[] = $printableType;
+        if ( '' !== $printableValue ) $content[] = $printableValue;
+        $content = implode("\n", $content);
+
+        $content = implode("\n", [
+            $optMultilineEscape,
+            $content,
+            $optMultilineEscape,
+        ]);
+
+        return $content;
+    }
+
+    public function print_type_value_multiline($value, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $options = $options ?? [];
+        $refContext = $refContext ?? [];
+
+        $options = $this->_var_dump_options(
+            [
+                static::VAR_DUMP_OPT_WITH_TYPE     => true,
+                static::VAR_DUMP_OPT_WITH_ID       => false,
+                static::VAR_DUMP_OPT_WITH_VALUE    => true,
+                static::VAR_DUMP_OPT_ARRAY_INDENT  => '  ',
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE => "\n",
+            ],
+            $options,
+            [
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 0,
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => true,
+            ]
+        );
+
+        $optWithBraces = $options[static::VAR_DUMP_OPT_WITH_BRACES];
+        $optMultilineEscape = $options[static::VAR_DUMP_OPT_MULTILINE_ESCAPE];
+
+        $output = $this->var_dump_output(
+            $value,
+            $options,
+            $refContext
+        );
+
+        $forceBraces = false;
+
+        $printableType = '';
+        $printableValue = '';
+
+        if ( array_key_exists('type', $output) ) {
+            $printableType .= $output['type'];
+        }
+        if ( array_key_exists('subtype', $output) ) {
+            $printableType .= '(' . $output['subtype'] . ')';
+        }
+        if ( array_key_exists('class', $output) ) {
+            $printableType .= ' # ' . $output['class'];
+        }
+
+        if ( array_key_exists('value', $output) ) {
+            $printableValue = $output['value'];
+        }
+
+        $withBraces = null
+            ?? $optWithBraces
+            ?? $forceBraces
+            ?? false;
+
+        if ( $withBraces ) {
+            $printableType = '{ ' . $printableType . ' }';
+        }
+
+        $content = [];
+        if ( '' !== $printableType ) $content[] = $printableType;
+        if ( '' !== $printableValue ) $content[] = $printableValue;
+        $content = implode("\n", $content);
+
+        $content = implode("\n", [
+            $optMultilineEscape,
+            $content,
+            $optMultilineEscape,
+        ]);
+
+        return $content;
+    }
+
+    public function print_type_id_value_multiline($value, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $options = $options ?? [];
+        $refContext = $refContext ?? [];
+
+        $options = $this->_var_dump_options(
+            [
+                static::VAR_DUMP_OPT_WITH_TYPE     => true,
+                static::VAR_DUMP_OPT_WITH_ID       => true,
+                static::VAR_DUMP_OPT_WITH_VALUE    => true,
+                static::VAR_DUMP_OPT_ARRAY_INDENT  => '  ',
+                static::VAR_DUMP_OPT_ARRAY_NEWLINE => "\n",
+            ],
+            $options,
+            [
+                static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX  => 0,
+                static::VAR_DUMP_OPT_MULTILINE_ESCAPE => '###',
+                static::VAR_DUMP_OPT_WITH_BRACES      => true,
+            ]
+        );
+
+        $optWithBraces = $options[static::VAR_DUMP_OPT_WITH_BRACES];
+        $optMultilineEscape = $options[static::VAR_DUMP_OPT_MULTILINE_ESCAPE];
+
+        $output = $this->var_dump_output(
+            $value,
+            $options,
+            $refContext
+        );
+
+        $forceBraces = false;
+
+        $printableType = '';
+        $printableValue = '';
+
+        if ( array_key_exists('type', $output) ) {
+            $printableType .= $output['type'];
+        }
+        if ( array_key_exists('subtype', $output) ) {
+            $printableType .= '(' . $output['subtype'] . ')';
+        }
+        if ( array_key_exists('class_original', $output) ) {
+            $printableType .= ' # ' . $output['class_original'];
+        }
+        if ( array_key_exists('id', $output) ) {
+            $printableType .= ' &' . $output['id'];
+        }
+
+        if ( array_key_exists('value', $output) ) {
+            $printableValue = $output['value'];
+        }
+
+        $withBraces = null
+            ?? $optWithBraces
+            ?? $forceBraces
+            ?? false;
+
+        if ( $withBraces ) {
+            $printableType = '{ ' . $printableType . ' }';
+        }
+
+        $content = [];
+        if ( '' !== $printableType ) $content[] = $printableType;
+        if ( '' !== $printableValue ) $content[] = $printableValue;
+        $content = implode("\n", $content);
+
+        $content = implode("\n", [
+            $optMultilineEscape,
+            $content,
+            $optMultilineEscape,
+        ]);
+
+        return $content;
+    }
+
+
+    public function print_array(array $value, ?int $levelMax = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $levelMax = $levelMax ?? 1;
+
+        $options[static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX] = $levelMax;
+
+        $content = $this->print_value($value, $options, $refContext);
+
+        return $content;
+    }
+
+    public function print_type_array(array $value, ?int $levelMax = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $levelMax = $levelMax ?? 1;
+
+        $options[static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX] = $levelMax;
+
+        $content = $this->print_type_value($value, $options, $refContext);
+
+        return $content;
+    }
+
+    public function print_type_id_array(array $value, ?int $levelMax = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $levelMax = $levelMax ?? 1;
+
+        $options[static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX] = $levelMax;
+
+        $content = $this->print_type_id_value($value, $options, $refContext);
+
+        return $content;
+    }
+
+
+    public function print_array_multiline(array $value, ?int $levelMax = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $levelMax = $levelMax ?? 1;
+
+        $options[static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX] = $levelMax;
+
+        $content = $this->print_value_multiline($value, $options, $refContext);
+
+        return $content;
+    }
+
+    public function print_type_array_multiline(array $value, ?int $levelMax = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $levelMax = $levelMax ?? 1;
+
+        $options[static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX] = $levelMax;
+
+        $content = $this->print_type_value_multiline($value, $options, $refContext);
+
+        return $content;
+    }
+
+    public function print_type_id_array_multiline(array $value, ?int $levelMax = null, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $levelMax = $levelMax ?? 1;
+
+        $options[static::VAR_DUMP_OPT_ARRAY_LEVEL_MAX] = $levelMax;
+
+        $content = $this->print_type_id_value_multiline($value, $options, $refContext);
+
+        return $content;
+    }
+
+
+    public function print_table(array $table) : string
+    {
+        if ( [] === $table ) {
+            return '';
+        }
+
+        $rowKeys = [];
+        foreach ( $table as $key => $devnull ) {
+            $rowKeys[$key] = true;
+        }
+
+        $colKeys = [];
+        foreach ( $rowKeys as $rowKey => $bool ) {
+            if ( ! is_array($table[$rowKey]) ) {
+                throw new RuntimeException(
+                    [ 'The `table` should be array of arrays', $table[$rowKey] ]
+                );
+            }
+
+            foreach ( $table[$rowKey] as $colKey => $devnull ) {
+                if ( ! isset($colKeys[$colKey]) ) {
+                    $colKeys[$colKey] = true;
+                }
+            }
+        }
+
+        $list = array_keys($rowKeys);
+        $thWidth = max(
+            array_map('strlen', $list)
+        );
+
+        $list = array_keys($colKeys);
+        $tdWidths = array_combine(
+            $list,
+            array_map('strlen', $list)
+        );
+
+        foreach ( $table as $row ) {
+            foreach ( $row as $colKey => $colValue ) {
+                $tdWidths[$colKey] = max(
+                    $tdWidths[$colKey] ?? 0,
+                    strlen((string) $colValue)
+                );
+            }
+        }
+
+        ob_start();
+
+        $fnDrawLine = static function () use ($thWidth, $tdWidths) {
+            echo '+';
+            echo str_repeat('-', $thWidth + 2);
+            echo '+';
+
+            foreach ( $tdWidths as $tdWidth ) {
+                // echo '';
+                echo str_repeat('-', $tdWidth + 2);
+                echo '+';
+            }
+
+            echo "\n";
+        };
+
+        call_user_func($fnDrawLine);
+
+        echo '| ';
+        echo str_pad('', $thWidth);
+        echo ' |';
+
+        foreach ( $colKeys as $colKey => $bool ) {
+            echo ' ';
+            echo str_pad($colKey, $tdWidths[$colKey]);
+            echo ' |';
+        }
+
+        echo "\n";
+
+        call_user_func($fnDrawLine);
+
+        foreach ( $table as $rowKey => $row ) {
+            echo '| ';
+            echo str_pad($rowKey, $thWidth);
+            echo ' |';
+
+            foreach ( $colKeys as $colKey => $bool ) {
+                echo ' ';
+                echo str_pad(
+                    $row[$colKey] ?? 'NULL',
+                    $tdWidths[$colKey]
+                );
+                echo ' |';
+            }
+
+            echo "\n";
+        }
+
+        call_user_func($fnDrawLine);
+
+        $content = ob_get_clean();
+
+        return $content;
+    }
+
+
+    public function dump_type($value, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type($value, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_all_type($values, $delimiter = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_all_type($values, $delimiter, $options, $refContext);
+        echo "\n";
+    }
+
+
+    public function dump_type_id($value, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type_id($value, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_all_type_id($values, $delimiter = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_all_type_id($values, $delimiter, $options, $refContext);
+        echo "\n";
+    }
+
+
+    public function dump_value($value, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_value($value, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_all_value($values, $delimiter = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_all_value($values, $delimiter, $options, $refContext);
+        echo "\n";
+    }
+
+
+    public function dump_type_value($value, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type_value($value, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_all_type_value($values, $delimiter = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_all_type_value($values, $delimiter, $options, $refContext);
+        echo "\n";
+    }
+
+
+    public function dump_type_id_value($value, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type_id_value($value, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_all_type_id_value($values, $delimiter = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_all_type_id_value($values, $delimiter, $options, $refContext);
+        echo "\n";
+    }
+
+
+    public function dump_value_multiline($value, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_value_multiline($value, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_type_value_multiline($value, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type_value_multiline($value, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_type_id_value_multiline($value, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type_id_value_multiline($value, $options, $refContext);
+        echo "\n";
+    }
+
+
+    public function dump_array($value, $levelMax = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_array($value, $levelMax, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_type_array($value, $levelMax = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type_array($value, $levelMax, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_type_id_array($value, $levelMax = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type_id_array($value, $levelMax, $options, $refContext);
+        echo "\n";
+    }
+
+
+    public function dump_array_multiline($value, $levelMax = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_array_multiline($value, $levelMax, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_type_array_multiline($value, $levelMax = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type_array_multiline($value, $levelMax, $options, $refContext);
+        echo "\n";
+    }
+
+    public function dump_type_id_array_multiline($value, $levelMax = null, $options = null, &$refContext = null) : void
+    {
+        echo $this->print_type_id_array_multiline($value, $levelMax, $options, $refContext);
+        echo "\n";
+    }
+
+
+    public function dump_table($table) : void
+    {
+        echo $this->print_table($table);
+        echo "\n";
     }
 
 
@@ -1607,90 +2242,89 @@ class DebugModule
     }
 
 
-    public function print_table(array $table, ?bool $return = null) : ?string
+    public function printerPrint(...$vars) : string
     {
-        if ( [] === $table ) {
-            return null;
-        }
+        return $this->dumper()->printerPrint(...$vars);
+    }
 
-        $rowKeys = array_fill_keys(
-            array_keys($table),
-            true
-        );
+    public function dumperDump(...$vars) : void
+    {
+        $this->dumper()->dumperDump(...$vars);
+    }
 
-        $colKeys = [];
-        foreach ( $rowKeys as $rowKey => $bool ) {
-            if ( ! is_array($table[$rowKey]) ) {
-                throw new RuntimeException(
-                    [ 'The `table` should be array of arrays', $table[$rowKey] ]
-                );
-            }
 
-            foreach ( $table[$rowKey] as $colKey => $devnull ) {
-                if ( ! isset($colKeys[$colKey]) ) {
-                    $colKeys[$colKey] = true;
-                }
-            }
-        }
+    public function dp($var, ...$vars) : string
+    {
+        $fileLine = Lib::file_line([], 1);
 
-        $thWidth = max(
-            array_map('strlen', array_keys($rowKeys))
-        );
-        $tdWidths = array_combine(
-            $list = array_keys($colKeys),
-            array_map('strlen', $list)
-        );
+        return $this->dumper()->dp($fileLine, $var, ...$vars);
+    }
 
-        foreach ( $table as $row ) {
-            foreach ( $row as $colKey => $colValue ) {
-                $tdWidths[$colKey] = max(
-                    $tdWidths[$colKey] ?? 0,
-                    strlen((string) $colValue)
-                );
-            }
-        }
+    public function fnDP(?int $traceShift = null, ?array $trace = null) : \Closure
+    {
+        return $this->dumper()->fnDP($traceShift, $trace);
+    }
 
-        if ( $return ) {
-            ob_start();
-        }
 
-        $fnDrawLine = static function () use ($thWidth, $tdWidths) {
-            echo '+';
-            echo str_repeat('-', $thWidth + 2) . '+';
-            foreach ( $tdWidths as $tdWidth ) {
-                echo str_repeat('-', $tdWidth + 2) . '+';
-            }
-            echo "\n";
-        };
+    /**
+     * @return mixed
+     */
+    public function d($var, ...$vars)
+    {
+        $fileLine = Lib::file_line([], 1);
 
-        call_user_func($fnDrawLine);
+        return $this->dumper()->d($fileLine, $var, ...$vars);
+    }
 
-        echo '|';
-        echo ' ' . str_pad('', $thWidth) . ' |';
-        foreach ( $colKeys as $colKey => $bool ) {
-            echo ' ' . str_pad($colKey, $tdWidths[$colKey]) . ' |';
-        }
-        echo "\n";
+    /**
+     * @return mixed|void
+     */
+    public function dd(...$vars)
+    {
+        $fileLine = Lib::file_line([], 1);
 
-        call_user_func($fnDrawLine);
+        return $this->dumper()->dd($fileLine, ...$vars);
+    }
 
-        foreach ( $table as $rowKey => $row ) {
-            echo '|';
-            echo ' ' . str_pad($rowKey, $thWidth) . ' |';
-            foreach ( $colKeys as $colKey => $bool ) {
-                echo ' ' . str_pad($row[$colKey] ?? 'NULL', $tdWidths[$colKey]) . ' |';
-            }
-            echo "\n";
-        }
+    public function fnD(?int $traceShift = null, ?array $trace = null) : \Closure
+    {
+        return $this->dumper()->fnD($traceShift, $trace);
+    }
 
-        call_user_func($fnDrawLine);
+    public function fnDD(?int $traceShift = null, ?array $trace = null) : \Closure
+    {
+        return $this->dumper()->fnDD($traceShift, $trace);
+    }
 
-        if ( $return ) {
-            $content = ob_get_clean();
 
-            return $content;
-        }
+    /**
+     * @return mixed|void
+     */
+    public function td(int $throttleMs, $var, ...$vars)
+    {
+        $fileLine = Lib::file_line([], 1);
 
-        return null;
+        return $this->dumper()->td($fileLine, $throttleMs, $var, ...$vars);
+    }
+
+    public function fnTD(?int $traceShift = null, ?array $trace = null) : \Closure
+    {
+        return $this->dumper()->fnTd($traceShift, $trace);
+    }
+
+
+    /**
+     * @return mixed|void
+     */
+    public function zd(?int $zTimes, $var, ...$vars)
+    {
+        $fileLine = Lib::file_line([], 1);
+
+        return $this->dumper()->zd($fileLine, $zTimes, $var, ...$vars);
+    }
+
+    public function fnZD(?int $traceShift = null, ?array $trace = null) : \Closure
+    {
+        return $this->dumper()->fnZD($traceShift, $trace);
     }
 }

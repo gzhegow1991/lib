@@ -5,7 +5,7 @@ namespace Gzhegow\Lib\Modules\Func\Pipe;
 use Gzhegow\Lib\Exception\Runtime\PipeException;
 
 
-class Pipe
+class FuncPipe
 {
     /**
      * @var static
@@ -18,7 +18,7 @@ class Pipe
     protected $queue = [];
 
     /**
-     * @var PipeContext
+     * @var FuncPipeContext
      */
     protected $context;
     /**
@@ -38,7 +38,7 @@ class Pipe
     /**
      * @var callable
      */
-    protected $fnCallUserFuncArgs;
+    protected $fnMakeArgsCallUserFuncArray;
 
 
     public static function new()
@@ -47,12 +47,12 @@ class Pipe
     }
 
 
-    public function __invoke($input = null, ?PipeContext $context = null, ...$args)
+    public function __invoke($input = null, ?FuncPipeContext $context = null, ...$args)
     {
         return $this->invoke($input, $context, $args);
     }
 
-    public function invoke($input = null, ?PipeContext $context = null, array $args = [])
+    public function invoke($input = null, ?FuncPipeContext $context = null, array $args = [])
     {
         if ( null !== $context ) {
             $this->context = $context;
@@ -79,7 +79,7 @@ class Pipe
      */
     public function setFnCallUserFuncArgs($fnCallUserFuncArgs)
     {
-        $this->fnCallUserFuncArgs = $fnCallUserFuncArgs;
+        $this->fnMakeArgsCallUserFuncArray = $fnCallUserFuncArgs;
 
         return $this;
     }
@@ -185,7 +185,7 @@ class Pipe
     /**
      * @return static
      */
-    public function setContext(?PipeContext $context)
+    public function setContext(?FuncPipeContext $context)
     {
         $this->context = $context;
 
@@ -211,7 +211,7 @@ class Pipe
             $hasContext = (null !== $this->context);
 
             $fnCallUserFuncArray = $this->fnCallUserFuncArray ?? [ $this, 'callUserFuncArray' ];
-            $fnCallUserFuncArgs = $this->fnCallUserFuncArgs ?? [ $this, 'callUserFuncArgs' ];
+            $fnMakeArgsCallUserFuncArray = $this->fnMakeArgsCallUserFuncArray ?? [ $this, 'makeArgsCallUserFuncArray' ];
 
             $pipeContext = null;
             $argsContext = [];
@@ -239,7 +239,7 @@ class Pipe
 
                         $fnCallUserFuncArray(
                             $stepFn,
-                            $fnCallUserFuncArgs(
+                            $fnMakeArgsCallUserFuncArray(
                                 $argsInput,
                                 $argsContext,
                                 $argsRun,
@@ -259,7 +259,7 @@ class Pipe
 
                         $result = $fnCallUserFuncArray(
                             $stepFn,
-                            $fnCallUserFuncArgs(
+                            $fnMakeArgsCallUserFuncArray(
                                 $argsInput,
                                 $argsContext,
                                 $argsRun,
@@ -281,7 +281,7 @@ class Pipe
 
                         $status = $fnCallUserFuncArray(
                             $stepFn,
-                            $fnCallUserFuncArgs(
+                            $fnMakeArgsCallUserFuncArray(
                                 $argsInput,
                                 $argsContext,
                                 $argsRun,
@@ -309,7 +309,7 @@ class Pipe
                         }
 
                         $pipeChild->fnCallUserFuncArray = $fnCallUserFuncArray;
-                        $pipeChild->fnCallUserFuncArgs = $fnCallUserFuncArgs;
+                        $pipeChild->fnMakeArgsCallUserFuncArray = $fnMakeArgsCallUserFuncArray;
 
                         $argsInput = [
                             0 => [ $pipeChild, 'run' ],
@@ -318,7 +318,7 @@ class Pipe
 
                         $result = $fnCallUserFuncArray(
                             $stepFn,
-                            $fnCallUserFuncArgs(
+                            $fnMakeArgsCallUserFuncArray(
                                 $argsInput,
                                 $argsContext,
                                 $argsRun,
@@ -341,7 +341,7 @@ class Pipe
 
                         $result = $fnCallUserFuncArray(
                             $stepFn,
-                            $fnCallUserFuncArgs(
+                            $fnMakeArgsCallUserFuncArray(
                                 $argsInput,
                                 $argsContext,
                                 $argsRun,
@@ -395,15 +395,12 @@ class Pipe
     /**
      * @return mixed
      */
-    protected function callUserFuncArray(
-        $fn,
-        array $args = []
-    )
+    protected function callUserFuncArray($fn, array $args = [])
     {
         return call_user_func_array($fn, $args);
     }
 
-    protected function callUserFuncArgs(
+    protected function makeArgsCallUserFuncArray(
         array $inputArgs,
         array $contextArgs,
         array ...$argsList

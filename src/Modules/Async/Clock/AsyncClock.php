@@ -5,7 +5,7 @@ namespace Gzhegow\Lib\Modules\Async\Clock;
 use Gzhegow\Lib\Lib;
 
 
-class Clock
+class AsyncClock
 {
     /**
      * @var bool
@@ -22,11 +22,11 @@ class Clock
      * @param int      $waitMs
      * @param callable $fn
      */
-    public static function setTimeout($waitMs, $fn) : Timeout
+    public static function setTimeout($waitMs, $fn) : AsyncTimeout
     {
         $timeout = static::getInstance()->setTimeout($waitMs, $fn);
 
-        if ( Clock::$isDebug ) {
+        if ( AsyncClock::$isDebug ) {
             $timeout->debugInfo = Lib::file_line();
         }
 
@@ -34,7 +34,7 @@ class Clock
     }
 
     /**
-     * @param Timeout $timer
+     * @param AsyncTimeout $timer
      */
     public static function clearTimeout($timer) : void
     {
@@ -51,11 +51,11 @@ class Clock
      * @param int      $waitMs
      * @param callable $fn
      */
-    public static function setInterval($waitMs, $fn) : Interval
+    public static function setInterval($waitMs, $fn) : AsyncInterval
     {
         $interval = static::getInstance()->setInterval($waitMs, $fn);
 
-        if ( Clock::$isDebug ) {
+        if ( AsyncClock::$isDebug ) {
             $interval->debugInfo = Lib::file_line();
         }
 
@@ -63,7 +63,7 @@ class Clock
     }
 
     /**
-     * @param Interval $interval
+     * @param AsyncInterval $interval
      */
     public static function clearInterval($interval) : void
     {
@@ -71,7 +71,7 @@ class Clock
     }
 
 
-    public static function getInstance() : ClockManagerInterface
+    public static function getInstance() : AsyncClockManagerInterface
     {
         return Lib::async()->clockManager();
     }

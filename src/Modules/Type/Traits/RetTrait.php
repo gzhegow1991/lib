@@ -2658,9 +2658,27 @@ trait RetTrait
 	/**
 	 * @return Ret<string>|string
 	 */
+	public function uuid_nil($fb, $value)
+	{
+		return Lib::random()->type_uuid_nil($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
 	public function uuid($fb, $value)
 	{
 		return Lib::random()->type_uuid($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function uuid_not_nil($fb, $value)
+	{
+		return Lib::random()->type_uuid_not_nil($fb, $value);
 	}
 
 
@@ -3141,26 +3159,9 @@ trait RetTrait
 
 
 	/**
-	 * @param string|true             $url
-	 * @param string|false|array|null $query
-	 * @param string|false|null       $fragment
+	 * > https://example.com:8080/example#example?example=1
+	 * > /example#example?example=1
 	 *
-	 * @return Ret<string>|string
-	 */
-	public function url(
-		$fb,
-		$url,
-		$query = null,
-		$fragment = null,
-		int $isHostIdnaAscii = null,
-		int $isLinkUrlencoded = null,
-		array $refs = []
-	) {
-		return Lib::url()->type_url($fb, $url, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs);
-	}
-
-
-	/**
 	 * @param string|true             $url
 	 * @param string|false|array|null $query
 	 * @param string|false|null       $fragment
@@ -3181,28 +3182,30 @@ trait RetTrait
 
 
 	/**
-	 * @param string|true $url
+	 * > https://example.com:8080/example#example?example=1
+	 *
+	 * @param string|true             $url
+	 * @param string|false|array|null $query
+	 * @param string|false|null       $fragment
 	 *
 	 * @return Ret<string>|string
 	 */
-	public function host($fb, $url, int $isHostIdnaAscii = null, array $refs = [])
-	{
-		return Lib::url()->type_host($fb, $url, $isHostIdnaAscii, $refs);
+	public function url(
+		$fb,
+		$url,
+		$query = null,
+		$fragment = null,
+		int $isHostIdnaAscii = null,
+		int $isLinkUrlencoded = null,
+		array $refs = []
+	) {
+		return Lib::url()->type_url($fb, $url, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs);
 	}
 
 
 	/**
-	 * @param string|true $url
+	 * > /example#example?example=1
 	 *
-	 * @return Ret<string>|string
-	 */
-	public function domain($fb, $url, int $isHostIdnaAscii = null, array $refs = [])
-	{
-		return Lib::url()->type_domain($fb, $url, $isHostIdnaAscii, $refs);
-	}
-
-
-	/**
 	 * @param string|true             $url
 	 * @param string|false|array|null $query
 	 * @param string|false|null       $fragment
@@ -3216,6 +3219,35 @@ trait RetTrait
 
 
 	/**
+	 * > https://example.com:8080/
+	 *
+	 * @param string|true $url
+	 *
+	 * @return Ret<string>|string
+	 */
+	public function host($fb, $url, int $isHostIdnaAscii = null, array $refs = [])
+	{
+		return Lib::url()->type_host($fb, $url, $isHostIdnaAscii, $refs);
+	}
+
+
+	/**
+	 * > example.com
+	 *
+	 * @param string|true $url
+	 *
+	 * @return Ret<string>|string
+	 */
+	public function domain($fb, $url, int $isHostIdnaAscii = null, array $refs = [])
+	{
+		return Lib::url()->type_domain($fb, $url, $isHostIdnaAscii, $refs);
+	}
+
+
+	/**
+	 * > mysql:host=localhost;dbname=testdb;charset=utf8mb4
+	 * > sqlite::memory:
+	 *
 	 * @return Ret<string>|string
 	 */
 	public function dsn_pdo($fb, $dsn, array $refs = [])

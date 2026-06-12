@@ -2,17 +2,17 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
+use Gzhegow\Lib\Modules\Func\Pipe\FuncPipe;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Func\Invoker\DefaultInvoker;
-use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
+use Gzhegow\Lib\Modules\Func\Invoker\DefaultFuncInvoker;
+use Gzhegow\Lib\Modules\Func\Invoker\FuncInvokerInterface;
 
 
 class FuncModule
 {
     /**
-     * @var InvokerInterface
+     * @var FuncInvokerInterface
      */
     protected $invoker;
 
@@ -27,25 +27,25 @@ class FuncModule
     }
 
 
-    public function newPipe() : Pipe
+    public function newPipe() : FuncPipe
     {
-        return Pipe::new();
+        return FuncPipe::new();
     }
 
 
-    public function newInvoker() : InvokerInterface
+    public function newInvoker() : FuncInvokerInterface
     {
-        $instance = new DefaultInvoker();
+        $instance = new DefaultFuncInvoker();
 
         return $instance;
     }
 
-    public function cloneInvoker() : InvokerInterface
+    public function cloneInvoker() : FuncInvokerInterface
     {
         return clone $this->invoker();
     }
 
-    public function invoker(?InvokerInterface $invoker = null) : InvokerInterface
+    public function invoker(?FuncInvokerInterface $invoker = null) : FuncInvokerInterface
     {
         return $this->invoker = null
             ?? $invoker
@@ -145,8 +145,6 @@ class FuncModule
             return [];
         }
 
-        $iArgs = [];
-
         $max = -1;
         $hasInt = false;
         $hasString = false;
@@ -172,12 +170,11 @@ class FuncModule
 
         if ( $hasInt && $hasString ) {
             throw new LogicException(
-                [
-                    'The `args` should contain arguments of single type: string or int',
-                    $args,
-                ]
+                [ 'The `args` should contain arguments of single type: string or int', $args ]
             );
         }
+
+        $iArgs = [];
 
         if ( $max >= 0 ) {
             for ( $i = 0; $i <= $max; $i++ ) {
@@ -318,8 +315,12 @@ class FuncModule
         [ $fnArgs ] = $this->func_args_unique($args);
 
         $isIntKeys = array_key_exists(0, $fnArgs);
+        $isStringKeys = ! $isIntKeys;
 
-        if ( ! ($isMaybeInternalFunction || ! $isIntKeys) ) {
+        if ( ! (false
+            || $isMaybeInternalFunction
+            || $isStringKeys
+        ) ) {
             $result = call_user_func_array($fn, $fnArgs);
 
         } else {

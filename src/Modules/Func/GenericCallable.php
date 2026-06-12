@@ -4,7 +4,7 @@ namespace Gzhegow\Lib\Modules\Func;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
-use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
+use Gzhegow\Lib\Modules\Func\Invoker\FuncInvokerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\CanIsSameInterface;
 
 
@@ -80,7 +80,7 @@ class GenericCallable implements
     {
     }
 
-    public function __invoke(InvokerInterface $invoker, ...$values)
+    public function __invoke(FuncInvokerInterface $invoker, ...$values)
     {
         return $invoker->callUserFuncArray($this, $values);
     }

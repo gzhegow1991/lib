@@ -2651,9 +2651,27 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
+	public function uuid_nil($value)
+	{
+		return Lib::random()->type_uuid_nil(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
 	public function uuid($value)
 	{
 		return Lib::random()->type_uuid(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function uuid_not_nil($value)
+	{
+		return Lib::random()->type_uuid_not_nil(null, $value);
 	}
 
 
@@ -3134,25 +3152,9 @@ trait TypeTrait
 
 
 	/**
-	 * @param string|true             $url
-	 * @param string|false|array|null $query
-	 * @param string|false|null       $fragment
+	 * > https://example.com:8080/example#example?example=1
+	 * > /example#example?example=1
 	 *
-	 * @return Ret<string>
-	 */
-	public function url(
-		$url,
-		$query = null,
-		$fragment = null,
-		int $isHostIdnaAscii = null,
-		int $isLinkUrlencoded = null,
-		array $refs = []
-	) {
-		return Lib::url()->type_url(null, $url, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs);
-	}
-
-
-	/**
 	 * @param string|true             $url
 	 * @param string|false|array|null $query
 	 * @param string|false|null       $fragment
@@ -3172,28 +3174,29 @@ trait TypeTrait
 
 
 	/**
-	 * @param string|true $url
+	 * > https://example.com:8080/example#example?example=1
+	 *
+	 * @param string|true             $url
+	 * @param string|false|array|null $query
+	 * @param string|false|null       $fragment
 	 *
 	 * @return Ret<string>
 	 */
-	public function host($url, int $isHostIdnaAscii = null, array $refs = [])
-	{
-		return Lib::url()->type_host(null, $url, $isHostIdnaAscii, $refs);
+	public function url(
+		$url,
+		$query = null,
+		$fragment = null,
+		int $isHostIdnaAscii = null,
+		int $isLinkUrlencoded = null,
+		array $refs = []
+	) {
+		return Lib::url()->type_url(null, $url, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs);
 	}
 
 
 	/**
-	 * @param string|true $url
+	 * > /example#example?example=1
 	 *
-	 * @return Ret<string>
-	 */
-	public function domain($url, int $isHostIdnaAscii = null, array $refs = [])
-	{
-		return Lib::url()->type_domain(null, $url, $isHostIdnaAscii, $refs);
-	}
-
-
-	/**
 	 * @param string|true             $url
 	 * @param string|false|array|null $query
 	 * @param string|false|null       $fragment
@@ -3207,6 +3210,35 @@ trait TypeTrait
 
 
 	/**
+	 * > https://example.com:8080/
+	 *
+	 * @param string|true $url
+	 *
+	 * @return Ret<string>
+	 */
+	public function host($url, int $isHostIdnaAscii = null, array $refs = [])
+	{
+		return Lib::url()->type_host(null, $url, $isHostIdnaAscii, $refs);
+	}
+
+
+	/**
+	 * > example.com
+	 *
+	 * @param string|true $url
+	 *
+	 * @return Ret<string>
+	 */
+	public function domain($url, int $isHostIdnaAscii = null, array $refs = [])
+	{
+		return Lib::url()->type_domain(null, $url, $isHostIdnaAscii, $refs);
+	}
+
+
+	/**
+	 * > mysql:host=localhost;dbname=testdb;charset=utf8mb4
+	 * > sqlite::memory:
+	 *
 	 * @return Ret<string>
 	 */
 	public function dsn_pdo($dsn, array $refs = [])

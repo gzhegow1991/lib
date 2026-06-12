@@ -3,7 +3,7 @@
 namespace Gzhegow\Lib\Modules\Async\Clock;
 
 
-abstract class AbstractTimer
+abstract class AbstractAsyncTimer
 {
     /**
      * @var array

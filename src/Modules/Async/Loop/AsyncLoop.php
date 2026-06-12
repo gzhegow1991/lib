@@ -3,29 +3,29 @@
 namespace Gzhegow\Lib\Modules\Async\Loop;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Async\Clock\Timeout;
-use Gzhegow\Lib\Modules\Async\Clock\Interval;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncTimeout;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncInterval;
 
 
-class Loop
+class AsyncLoop
 {
-    public static function addInterval(Interval $interval) : LoopManagerInterface
+    public static function addInterval(AsyncInterval $interval) : AsyncLoopManagerInterface
     {
         return static::getInstance()->addInterval($interval);
     }
 
-    public static function clearInterval(Interval $interval) : LoopManagerInterface
+    public static function clearInterval(AsyncInterval $interval) : AsyncLoopManagerInterface
     {
         return static::getInstance()->clearInterval($interval);
     }
 
 
-    public static function addTimeout(Timeout $timer) : LoopManagerInterface
+    public static function addTimeout(AsyncTimeout $timer) : AsyncLoopManagerInterface
     {
         return static::getInstance()->addTimeout($timer);
     }
 
-    public static function clearTimeout(Timeout $timer) : LoopManagerInterface
+    public static function clearTimeout(AsyncTimeout $timer) : AsyncLoopManagerInterface
     {
         return static::getInstance()->clearTimeout($timer);
     }
@@ -34,7 +34,7 @@ class Loop
     /**
      * @param callable $fnMicrotask
      */
-    public static function addMicrotask($fnMicrotask) : LoopManagerInterface
+    public static function addMicrotask($fnMicrotask) : AsyncLoopManagerInterface
     {
         return static::getInstance()->addMicrotask($fnMicrotask);
     }
@@ -42,7 +42,7 @@ class Loop
     /**
      * @param callable $fnMacrotask
      */
-    public static function addMacrotask($fnMacrotask) : LoopManagerInterface
+    public static function addMacrotask($fnMacrotask) : AsyncLoopManagerInterface
     {
         return static::getInstance()->addMacrotask($fnMacrotask);
     }
@@ -51,19 +51,19 @@ class Loop
     /**
      * @param callable $fn
      */
-    public static function requestAnimationFrame($fn) : LoopManagerInterface
+    public static function requestAnimationFrame($fn) : AsyncLoopManagerInterface
     {
         return static::getInstance()->requestAnimationFrame($fn);
     }
 
 
-    public static function runLoop() : LoopManagerInterface
+    public static function runLoop() : AsyncLoopManagerInterface
     {
         return static::getInstance()->runLoop();
     }
 
 
-    public static function getInstance() : LoopManagerInterface
+    public static function getInstance() : AsyncLoopManagerInterface
     {
         return Lib::async()->loopManager();
     }

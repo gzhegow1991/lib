@@ -6,7 +6,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class DefaultBacktracer implements BacktracerInterface
+class DefaultDebugBacktracer implements DebugBacktracerInterface
 {
     /**
      * @var array

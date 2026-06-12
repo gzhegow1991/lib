@@ -6,14 +6,14 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
-use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
-use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
+use Gzhegow\Lib\Modules\Async\Loop\AsyncLoopManagerInterface;
+use Gzhegow\Lib\Modules\Async\FetchApi\AsyncFetchApiInterface;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncClockManagerInterface;
 use Gzhegow\Lib\Modules\Async\Promise\Pooling\PromisePoolingContext;
 use Gzhegow\Lib\Modules\Async\Promise\Pooling\PromisePoolingFactoryInterface;
 
 
-class DefaultPromiseManager implements PromiseManagerInterface
+class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
 {
     /**
      * @var PromisePoolingFactoryInterface
@@ -21,16 +21,16 @@ class DefaultPromiseManager implements PromiseManagerInterface
     protected $poolingFactory;
 
     /**
-     * @var ClockManagerInterface
+     * @var AsyncClockManagerInterface
      */
     protected $clockManager;
     /**
-     * @var LoopManagerInterface
+     * @var AsyncLoopManagerInterface
      */
     protected $loopManager;
 
     /**
-     * @var FetchApiInterface
+     * @var AsyncFetchApiInterface
      */
     protected $fetchApi;
 
@@ -47,10 +47,10 @@ class DefaultPromiseManager implements PromiseManagerInterface
     public function __construct(
         PromisePoolingFactoryInterface $poolingFactory,
         //
-        ?ClockManagerInterface $clockManager = null,
-        ?LoopManagerInterface $loopManager = null,
+        ?AsyncClockManagerInterface $clockManager = null,
+        ?AsyncLoopManagerInterface $loopManager = null,
         //
-        ?FetchApiInterface $fetchApi = null
+        ?AsyncFetchApiInterface $fetchApi = null
     )
     {
         $theAsync = Lib::async();
@@ -272,7 +272,8 @@ class DefaultPromiseManager implements PromiseManagerInterface
         ) {
             $nowMicrotime = $ctx->updateNowMicrotime();
 
-            call_user_func_array($fnPooling, [ $ctx ]);
+            // > call_user_func_array($fnPooling, [ $ctx ]);
+            $fnPooling($ctx);
 
             if ( $ctx->hasResult($refResult) ) {
                 $fnResolve($refResult);

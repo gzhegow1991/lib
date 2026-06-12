@@ -55,8 +55,8 @@ class CurlModule
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_MAXREDIRS      => 10,
                 //
-                CURLOPT_SSL_VERIFYPEER => true,
                 CURLOPT_SSL_VERIFYHOST => 2,
+                CURLOPT_SSL_VERIFYPEER => 1,
                 //
                 CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_2_0,
                 //

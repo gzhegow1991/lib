@@ -6,7 +6,7 @@ use Throwable as T;
 use Gzhegow\Lib\Exception\ExceptInterface;
 
 
-interface ThrowablerInterface
+interface DebugThrowablerInterface
 {
     /**
      * @param \Throwable|ExceptInterface $throwable

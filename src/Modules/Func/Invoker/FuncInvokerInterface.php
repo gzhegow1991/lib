@@ -5,7 +5,7 @@ namespace Gzhegow\Lib\Modules\Func\Invoker;
 use Gzhegow\Lib\Modules\Func\GenericCallable;
 
 
-interface InvokerInterface
+interface FuncInvokerInterface
 {
     /**
      * @template T

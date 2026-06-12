@@ -2,7 +2,8 @@
 
 namespace Gzhegow\Lib\Modules\Async\FetchApi;
 
-interface FetchApiInterface
+
+interface AsyncFetchApiInterface
 {
     public function pushTask(&$refTaskId, string $url, array $curlOptions = [], ?int $blockTimeoutMs = null) : bool;
 

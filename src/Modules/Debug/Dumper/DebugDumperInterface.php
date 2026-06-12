@@ -2,7 +2,8 @@
 
 namespace Gzhegow\Lib\Modules\Debug\Dumper;
 
-interface DumperInterface
+
+interface DebugDumperInterface
 {
     public function hasSymfonyVarDumper() : bool;
 

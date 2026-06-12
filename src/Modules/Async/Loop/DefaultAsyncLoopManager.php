@@ -3,18 +3,18 @@
 namespace Gzhegow\Lib\Modules\Async\Loop;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Async\Clock\Timeout;
-use Gzhegow\Lib\Modules\Async\Clock\Interval;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncTimeout;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncInterval;
 
 
-class DefaultLoopManager implements LoopManagerInterface
+class DefaultAsyncLoopManager implements AsyncLoopManagerInterface
 {
     /**
-     * @var \SplObjectStorage<Interval>
+     * @var \SplObjectStorage<AsyncInterval>
      */
     protected $intervals;
     /**
-     * @var \SplObjectStorage<Timeout>
+     * @var \SplObjectStorage<AsyncTimeout>
      */
     protected $timers;
 
@@ -92,7 +92,7 @@ class DefaultLoopManager implements LoopManagerInterface
     /**
      * @return static
      */
-    public function addInterval(Interval $interval)
+    public function addInterval(AsyncInterval $interval)
     {
         $this->intervals->attach($interval);
         $this->registerShutdownFunction();
@@ -103,7 +103,7 @@ class DefaultLoopManager implements LoopManagerInterface
     /**
      * @return static
      */
-    public function clearInterval(Interval $interval)
+    public function clearInterval(AsyncInterval $interval)
     {
         $this->intervals->detach($interval);
 
@@ -114,7 +114,7 @@ class DefaultLoopManager implements LoopManagerInterface
     /**
      * @return static
      */
-    public function addTimeout(Timeout $timer)
+    public function addTimeout(AsyncTimeout $timer)
     {
         $this->timers->attach($timer);
         $this->registerShutdownFunction();
@@ -125,7 +125,7 @@ class DefaultLoopManager implements LoopManagerInterface
     /**
      * @return static
      */
-    public function clearTimeout(Timeout $timer)
+    public function clearTimeout(AsyncTimeout $timer)
     {
         $this->timers->detach($timer);
 

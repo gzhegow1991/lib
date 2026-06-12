@@ -7,7 +7,7 @@ use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Func\GenericCallable;
 
 
-class DefaultInvoker implements InvokerInterface
+class DefaultFuncInvoker implements FuncInvokerInterface
 {
     /**
      * @template T
@@ -61,14 +61,11 @@ class DefaultInvoker implements InvokerInterface
                 }
 
             } elseif ( $fn->isFunction() ) {
-                if ( $fn->hasFunctionStringInternal($fnString) ) {
-                    $theFunc = Lib::func();
+                if ( $fn->hasFunctionStringInternal($fnStringInternal) ) {
+                    $cb = static function (...$args) use ($fnStringInternal) {
+                        $theFunc = Lib::func();
 
-                    $cb = static function (...$args) use (
-                        $theFunc,
-                        $fnString
-                    ) {
-                        return $theFunc->call_user_func_array($fnString, $args);
+                        return $theFunc->call_user_func_array($fnStringInternal, $args);
                     };
 
                 } else {
@@ -118,14 +115,11 @@ class DefaultInvoker implements InvokerInterface
                 }
 
             } elseif ( $fn->isFunction() ) {
-                if ( $fn->hasFunctionStringInternal($fnString) ) {
-                    $theFunc = Lib::func();
+                if ( $fn->hasFunctionStringInternal($fnStringInternal) ) {
+                    $cb = static function (...$args) use ($fnStringInternal) {
+                        $theFunc = Lib::func();
 
-                    $cb = static function (...$args) use (
-                        $theFunc,
-                        $fnString
-                    ) {
-                        return $theFunc->call_user_func_array($fnString, $args);
+                        return $theFunc->call_user_func_array($fnStringInternal, $args);
                     };
 
                 } else {

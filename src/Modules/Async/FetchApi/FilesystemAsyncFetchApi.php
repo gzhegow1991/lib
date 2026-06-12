@@ -11,7 +11,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class FilesystemFetchApi implements FetchApiInterface
+class FilesystemAsyncFetchApi implements AsyncFetchApiInterface
 {
     /**
      * @var string
@@ -165,7 +165,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $queueFile = $this->queueFile;
 
-        $taskId = $theRandom->uuid();
+        $taskId = $theRandom->uuid_v4();
 
         $task = [
             'id'           => $taskId,
@@ -326,8 +326,8 @@ class FilesystemFetchApi implements FetchApiInterface
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
         //
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 2);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
         //
         curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
         //
@@ -664,7 +664,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $cmd = [];
         $cmd[] = realpath(PHP_BINARY);
-        $cmd[] = $this->binFilename;
+        $cmd[] = $this->binFileRealpath;
         $cmd[] = $timeoutMsInt;
         $cmd[] = $lockWaitTimeoutMsInt;
 
@@ -673,6 +673,11 @@ class FilesystemFetchApi implements FetchApiInterface
         $proc
             ->setCmd($cmd)
             ->setCwd($this->binDirRealpath)
+            //
+            // > debug
+            // ->setStdoutFile(__DIR_ROOT__ . '/stdout.txt')
+            // ->setStderrFile(__DIR_ROOT__ . '/stderr.txt')
+            // < debug
         ;
 
         $thePhpProcessManager->spawnBackground($proc);

@@ -13,7 +13,7 @@ interface ProcessManagerInterface
     /**
      * @return \Symfony\Component\Process\Process
      */
-    public function newSymfonyProcess(Proc $proc) : object;
+    public function newSymfonyProcess(ProcessProc $proc) : object;
 
     /**
      * @return static
@@ -21,25 +21,25 @@ interface ProcessManagerInterface
     public function useSymfonyProcess(?bool $useSymfonyProcess = null);
 
 
-    public function newProc() : Proc;
+    public function newProc() : ProcessProc;
 
-    public function newProcNormal() : Proc;
+    public function newProcNormal() : ProcessProc;
 
-    public function newProcBackground() : Proc;
+    public function newProcBackground() : ProcessProc;
 
-
-    /**
-     * @return static
-     */
-    public function spawn(Proc $proc);
 
     /**
      * @return static
      */
-    public function spawnNormal(Proc $proc);
+    public function spawn(ProcessProc $proc);
 
     /**
      * @return static
      */
-    public function spawnBackground(Proc $proc);
+    public function spawnNormal(ProcessProc $proc);
+
+    /**
+     * @return static
+     */
+    public function spawnBackground(ProcessProc $proc);
 }

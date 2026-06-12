@@ -2242,7 +2242,7 @@ class FsModule
             } elseif ( 1 === $insideBlock ) {
                 fwrite($output, $startTrim . "\n");
 
-                foreach ( $thePhp->to_list_it($lines) as $line ) {
+                foreach ( $thePhp->to_list($lines) as $line ) {
                     $line = rtrim($line);
 
                     fwrite($output, $line . "\n");
@@ -2259,7 +2259,7 @@ class FsModule
 
             fwrite($output, $startTrim . "\n");
 
-            foreach ( $thePhp->to_list_it($lines) as $line ) {
+            foreach ( $thePhp->to_list($lines) as $line ) {
                 $line = trim($line);
 
                 fwrite($output, $line . "\n");

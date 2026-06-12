@@ -380,7 +380,7 @@ trait PromiseTrait
     }
 
 
-    public static function getInstance() : PromiseManagerInterface
+    public static function getInstance() : AsyncPromiseManagerInterface
     {
         return Lib::async()->promiseManager();
     }

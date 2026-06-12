@@ -137,171 +137,65 @@ class RandomModule
     }
 
 
-    /**
-     * @param string $refValue
-     *
-     * @return string
-     */
-    public function idIncrement(&$refValue) : string
+    public function the_uuid_nil() : string
     {
-        $val = $refValue;
-
-        if ( is_int($val) ) {
-            if ( $val === PHP_INT_MAX ) {
-                $theBcmath = Lib::bcmath();
-
-                $val = $theBcmath->bcadd($val, 1);
-
-            } else {
-                $val++;
-            }
-
-        } else {
-            $theType = Lib::type();
-
-            $theType->ctype_digit($val)->orThrow();
-
-            if ( false
-                || (strlen($val) > strlen(PHP_INT_MAX))
-                || (floatval($val) >= PHP_INT_MAX)
-            ) {
-                $theBcmath = Lib::bcmath();
-
-                $val = $theBcmath->bcadd($val, 1);
-
-            } else {
-                $val = ((int) $val) + 1;
-            }
-        }
-
-        $valString = (string) $val;
-
-        $refValue = $valString;
-
-        return $valString;
-    }
-
-
-    public function uuidV4() : string
-    {
-        $fn = $this->stateFnUuidV4();
-
-        $uuid = $fn();
-
-        $this->type_uuid_v4([], $uuid);
-
-        return $uuid;
-    }
-
-    public function uuidV5(string $namespaceUuid, string $name) : string
-    {
-        $this->type_uuid([], $namespaceUuid);
-
-        $fn = $this->stateFnUuidV5();
-
-        $uuid = $fn($namespaceUuid, $name);
-
-        $this->type_uuid_v5([], $uuid);
-
-        return $uuid;
-    }
-
-    public function uuidV7() : string
-    {
-        $fn = $this->stateFnUuidV7();
-
-        $uuid = $fn();
-
-        $this->type_uuid_v7([], $uuid);
-
-        return $uuid;
-    }
-
-
-    protected function fnUuidV4() : string
-    {
-        $block1 = random_int(0, 0xFFFFFFFF);
-        $block2 = random_int(0, 0xFFFF);
-
-        $uuidV4Version = (random_int(0, 0x0FFF) | 0x4000);
-        $uuidV4Variant = (random_int(0, 0x3FFF) | 0x8000);
-
-        $block5 = random_int(0, 0xFFFFFFFFFFFF);
-
-        $uuid = sprintf(
-            '%08x-%04x-%04x-%04x-%012x',
-            $block1,
-            $block2,
-            $uuidV4Version,
-            $uuidV4Variant,
-            $block5
-        );
-
-        return $uuid;
-    }
-
-    protected function fnUuidV5(string $namespaceUuid, string $name) : string
-    {
-        $namespaceSanitized = str_replace([ '-', '{', '}', '[', ']' ], '', $namespaceUuid);
-        $namespaceSanitized = strtolower($namespaceSanitized);
-
-        $binaryNamespace = pack('H*', $namespaceSanitized);
-
-        $hash = hash('sha1', $binaryNamespace . $name, true);
-
-        $block1 = unpack('N', substr($hash, 0, 4))[1];
-        $block2 = unpack('n', substr($hash, 4, 2))[1];
-        $block3 = unpack('n', substr($hash, 6, 2))[1];
-        $block4 = unpack('n', substr($hash, 8, 2))[1];
-
-        $block5Part1 = unpack('n', substr($hash, 10, 2))[1];
-        $block5Part2 = unpack('N', substr($hash, 12, 4))[1];
-
-        $uuidV5Version = (($block3 & 0x0FFF) | 0x5000);
-        $uuidV5Variant = (($block4 & 0x3FFF) | 0x8000);
-
-        $uuid = sprintf(
-            '%08x-%04x-%04x-%04x-%04x%08x',
-            $block1,
-            $block2,
-            $uuidV5Version,
-            $uuidV5Variant,
-            $block5Part1,
-            $block5Part2
-        );
-
-        return $uuid;
-    }
-
-    protected function fnUuidV7() : string
-    {
-        $timestamp = (int) (microtime(true) * 1000);
-
-        $block1 = (($timestamp >> 16) & 0xFFFFFFFF);
-        $block2 = ($timestamp & 0xFFFF);
-
-        $uuidV7Version = (random_int(0, 0x0FFF) | 0x7000);
-        $uuidV7Variant = (random_int(0, 0x3FFF) | 0x8000);
-
-        $block5 = random_int(0, 0xFFFFFFFFFFFF);
-
-        $uuid = sprintf(
-            '%08x-%04x-%04x-%04x-%012x',
-            $block1,
-            $block2,
-            $uuidV7Version,
-            $uuidV7Variant,
-            $block5
-        );
-
-        return $uuid;
+        return '00000000-0000-0000-0000-000000000000';
     }
 
 
     /**
      * @return Ret<string>|string
      */
+    public function type_uuid_nil($fb, $value)
+    {
+        if ( $this->the_uuid_nil() == $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be nil-uuid', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
     public function type_uuid($fb, $value)
+    {
+        $theType = Lib::type();
+
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( $this->the_uuid_nil() === $valueString ) {
+            return Ret::ok($fb, $valueString);
+        }
+
+        $regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-[1-8][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
+        if ( ! preg_match($regex, $valueString) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be valid uuid', $valueString ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_uuid_not_nil($fb, $value)
     {
         $theType = Lib::type();
 
@@ -326,6 +220,7 @@ class RandomModule
 
         return Ret::ok($fb, $valueString);
     }
+
 
     /**
      * @return Ret<string>|string
@@ -433,7 +328,7 @@ class RandomModule
             try {
                 $result = random_bytes($len);
             }
-            catch ( \Exception $e ) {
+            catch ( \Throwable $e ) {
                 throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
             }
 
@@ -468,7 +363,9 @@ class RandomModule
 
     public function random_hex(?int $len = null) : string
     {
-        $array = unpack('H*', $this->random_bytes($len));
+        $bytes = $this->random_bytes($len);
+
+        $array = unpack('H*', $bytes);
 
         $result = reset($array);
 
@@ -481,7 +378,7 @@ class RandomModule
             $rand = random_int($min, $max);
         }
         catch ( \Throwable $e ) {
-            throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
+            throw new RuntimeException($e);
         }
 
         return $rand;
@@ -537,5 +434,212 @@ class RandomModule
     public function random_base36(?int $len = null) : string
     {
         return Lib::crypt()->base36_encode($this->random_bytes($len));
+    }
+
+
+    /**
+     * > uuid v4 - полностью случайная последовательность символов
+     */
+    public function uuid_v4() : string
+    {
+        $fn = $this->stateFnUuidV4();
+
+        $uuid = $fn();
+
+        $this->type_uuid_v4([], $uuid);
+
+        return $uuid;
+    }
+
+    /**
+     * > uuid v5 - для одинаковых namespace/name всегда возвращает одинаковый UUID
+     */
+    public function uuid_v5(string $namespaceUuid, string $name) : string
+    {
+        $this->type_uuid([], $namespaceUuid);
+
+        $fn = $this->stateFnUuidV5();
+
+        $uuid = $fn($namespaceUuid, $name);
+
+        $this->type_uuid_v5([], $uuid);
+
+        return $uuid;
+    }
+
+    /**
+     * > uuid v7 - случайная последовательность, однако каждая следующая при сортировке будет после предыдущей (время)
+     */
+    public function uuid_v7() : string
+    {
+        $fn = $this->stateFnUuidV7();
+
+        $uuid = $fn();
+
+        $this->type_uuid_v7([], $uuid);
+
+        return $uuid;
+    }
+
+    protected function fnUuidV4() : string
+    {
+        $fn = 'random_int';
+
+        $block1 = $fn(0, 0xFFFFFFFF);
+        $block2 = $fn(0, 0xFFFF);
+
+        $uuidV4Version = ($fn(0, 0x0FFF) | 0x4000);
+        $uuidV4Variant = ($fn(0, 0x3FFF) | 0x8000);
+
+        $block5 = $fn(0, 0xFFFFFFFFFFFF);
+
+        $uuid = sprintf(
+            '%08x-%04x-%04x-%04x-%012x',
+            $block1,
+            $block2,
+            $uuidV4Version,
+            $uuidV4Variant,
+            $block5
+        );
+
+        return $uuid;
+    }
+
+    protected function fnUuidV5(string $namespaceUuid, string $name) : string
+    {
+        $namespaceSanitized = str_replace([ '-', '{', '}', '[', ']' ], '', $namespaceUuid);
+        $namespaceSanitized = strtolower($namespaceSanitized);
+
+        $binaryNamespace = pack('H*', $namespaceSanitized);
+
+        $hash = hash('sha1', $binaryNamespace . $name, true);
+
+        $block1 = unpack('N', substr($hash, 0, 4))[1];
+        $block2 = unpack('n', substr($hash, 4, 2))[1];
+        $block3 = unpack('n', substr($hash, 6, 2))[1];
+        $block4 = unpack('n', substr($hash, 8, 2))[1];
+
+        $block5Part1 = unpack('n', substr($hash, 10, 2))[1];
+        $block5Part2 = unpack('N', substr($hash, 12, 4))[1];
+
+        $uuidV5Version = (($block3 & 0x0FFF) | 0x5000);
+        $uuidV5Variant = (($block4 & 0x3FFF) | 0x8000);
+
+        $uuid = sprintf(
+            '%08x-%04x-%04x-%04x-%04x%08x',
+            $block1,
+            $block2,
+            $uuidV5Version,
+            $uuidV5Variant,
+            $block5Part1,
+            $block5Part2
+        );
+
+        return $uuid;
+    }
+
+    protected function fnUuidV7() : string
+    {
+        $fn = 'random_int';
+
+        $timestamp = (int) (microtime(true) * 1000);
+
+        $block1 = (($timestamp >> 16) & 0xFFFFFFFF);
+        $block2 = ($timestamp & 0xFFFF);
+
+        $uuidV7Version = ($fn(0, 0x0FFF) | 0x7000);
+        $uuidV7Variant = ($fn(0, 0x3FFF) | 0x8000);
+
+        $block5 = $fn(0, 0xFFFFFFFFFFFF);
+
+        $uuid = sprintf(
+            '%08x-%04x-%04x-%04x-%012x',
+            $block1,
+            $block2,
+            $uuidV7Version,
+            $uuidV7Variant,
+            $block5
+        );
+
+        return $uuid;
+    }
+
+
+    /**
+     * > числовой id, который после достижения лимита int начинает использовать bcmath() для увеличения на единицу, всегда возвращает строку
+     *
+     * @param string $refValue
+     */
+    public function id_increment($value, &$refValue = null) : string
+    {
+        $value = $value ?? 0;
+
+        $val = $value;
+
+        if ( is_int($val) ) {
+            if ( $val === PHP_INT_MAX ) {
+                Lib::bcmath();
+
+                $valString = bcadd($val, 1);
+
+            } else {
+                $val++;
+
+                $valString = (string) $val;
+            }
+
+        } elseif ( is_numeric($val) ) {
+            Lib::bcmath();
+
+            $valString = bcadd($val, 1);
+
+        } else {
+            throw new LogicException(
+                [ 'The `value` should be int or numeric', $value ]
+            );
+        }
+
+        $refValue = $valString;
+
+        return $valString;
+    }
+
+    /**
+     * > числовой id, который после достижения лимита int начинает использовать bcmath() для увеличения на единицу, всегда возвращает строку
+     *
+     * @param string $refValue
+     */
+    public function id_decrement($value, &$refValue = null) : string
+    {
+        $value = $value ?? 0;
+
+        $val = $value;
+
+        if ( is_int($val) ) {
+            if ( $val === PHP_INT_MIN ) {
+                Lib::bcmath();
+
+                $valString = bcsub($val, 1);
+
+            } else {
+                $val--;
+
+                $valString = (string) $val;
+            }
+
+        } elseif ( is_numeric($val) ) {
+            Lib::bcmath();
+
+            $valString = bcsub($val, 1);
+
+        } else {
+            throw new LogicException(
+                [ 'The `value` should be int or numeric', $value ]
+            );
+        }
+
+        $refValue = $valString;
+
+        return $valString;
     }
 }

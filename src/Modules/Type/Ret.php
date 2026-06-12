@@ -67,17 +67,12 @@ class Ret
             $theRet = static::new();
             $theRet->value = [ $value ];
 
-            return $theRet;
-
-        } elseif ( is_bool($fb) ) {
-            // > boolean
-
-            return $fb->getStatus();
+            $result = $theRet;
 
         } elseif ( is_array($fb) ) {
             // > value
 
-            return $value;
+            $result = $value;
 
         } elseif ( $fb instanceof self ) {
             // > boolean
@@ -87,10 +82,15 @@ class Ret
 
             $fb->mergeFrom($theRet);
 
-            return $fb->getStatus();
+            $result = $fb->getStatus();
+
+        } else {
+            throw new LogicException(
+                [ 'The `fb` should be null, array or instance of: ' . self::class, $fb ]
+            );
         }
 
-        return $value;
+        return $result;
     }
 
     /**
@@ -160,36 +160,37 @@ class Ret
             $theRet->_addError($eTrace, $eFileLine, $err, $errArgs);
         }
 
+        $result = [];
+
         if ( null === $fb ) {
             // > ret object
-            return $theRet;
-
-        } elseif ( is_bool($fb) ) {
-            // > boolean
-
-            return $fb->getStatus();
+            $result = [ $theRet ];
 
         } elseif ( is_array($fb) ) {
             // > default/throw
 
             if ( array_key_exists(0, $fb) ) {
-                return $fb[0];
+                $result = [ $fb[0] ];
             }
-
-            $theRet->throwErrors();
 
         } elseif ( $fb instanceof self ) {
             // > boolean
 
             $fb->mergeFrom($theRet);
 
-            return $fb->getStatus();
+            $result = [ $fb->getStatus() ];
 
         } else {
-            // > throw
-
-            $theRet->throwErrors();
+            throw new LogicException(
+                [ 'The `fb` should be null, array or instance of: ' . self::class, $fb ]
+            );
         }
+
+        if ( [] !== $result ) {
+            return $result[0];
+        }
+
+        $theRet->throwErrors();
     }
 
 

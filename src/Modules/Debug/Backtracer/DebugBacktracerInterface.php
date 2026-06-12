@@ -2,7 +2,8 @@
 
 namespace Gzhegow\Lib\Modules\Debug\Backtracer;
 
-interface BacktracerInterface
+
+interface DebugBacktracerInterface
 {
     /**
      * @return static

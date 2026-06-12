@@ -18,6 +18,7 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToBoolInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToIndexInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Pooling\DefaultPoolingFactory;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
@@ -2630,6 +2631,51 @@ class PhpModule
         return $valueStdClass;
     }
 
+
+    public function to_index($value, array $options = []) : array
+    {
+        if ( null === $value ) {
+            return [];
+        }
+
+        if ( $value instanceof ToIndexInterface ) {
+            return $value->toIndex($options);
+        }
+
+        $valueArray = $this->to_array($value, $options);
+
+        $result = [];
+
+        foreach ( $valueArray as $key => $val ) {
+            if ( is_bool($val) ) {
+                $result[$key] = $val;
+
+            } else {
+                $result[$val] = true;
+            }
+        }
+
+        return $result;
+    }
+
+    public function to_list($value, array $options = []) : array
+    {
+        if ( null === $value ) {
+            return [];
+        }
+
+        if ( $value instanceof ToListInterface ) {
+            return $value->toList($options);
+        }
+
+        $valueArray = $this->to_array($value, $options);
+
+        $result = array_values($valueArray);
+
+        return $result;
+    }
+
+
     public function to_iterable($value, array $options = []) : iterable
     {
         if ( null === $value ) {
@@ -2651,73 +2697,6 @@ class PhpModule
         }
 
         return [ $value ];
-    }
-
-
-    public function to_index($value, $options = []) : array
-    {
-        $valueArray = $this->to_array($value, $options);
-
-        $result = [];
-
-        foreach ( $valueArray as $key => $val ) {
-            if ( is_bool($val) ) {
-                $result[$key] = $val;
-
-            } else {
-                $result[$val] = true;
-            }
-        }
-
-        return $result;
-    }
-
-
-    public function to_list($value, array $options = []) : array
-    {
-        if ( null === $value ) {
-            return [];
-        }
-
-        $it = $this->to_list_it($value, $options);
-
-        $list = iterator_to_array($it);
-
-        return $list;
-    }
-
-    public function to_list_it($value, array $options = []) : \Generator
-    {
-        if ( null === $value ) {
-            return true;
-        }
-
-        $theType = Lib::type();
-
-        if ( $value instanceof ToListInterface ) {
-            $list = $value->toList($options);
-
-            foreach ( $list as $v ) {
-                yield $v;
-            }
-
-        } elseif ( is_array($value) ) {
-            $ret = $theType->list($value);
-
-            if ( $ret->isOk([ &$valueList ]) ) {
-                foreach ( $valueList as $v ) {
-                    yield $v;
-                }
-
-            } else {
-                yield $value;
-            }
-
-        } else {
-            yield $value;
-        }
-
-        return true;
     }
 
 
@@ -3688,14 +3667,17 @@ class PhpModule
 
             if ( $hasFnCatch ) {
                 try {
-                    call_user_func_array($fnPooling, [ $ctx ]);
+                    // > call_user_func_array($fnPooling, [ $ctx ]);
+                    $fnPooling($ctx);
                 }
                 catch ( \Throwable $e ) {
-                    call_user_func_array($fnCatch, [ $e, $ctx ]);
+                    // > call_user_func_array($fnCatch, [ $e, $ctx ]);
+                    $fnCatch($e, $ctx);
                 }
 
             } else {
-                call_user_func_array($fnPooling, [ $ctx ]);
+                // > call_user_func_array($fnPooling, [ $ctx ]);
+                $fnPooling($ctx);
             }
 
             if ( $ctx->hasResult($refResult) ) {

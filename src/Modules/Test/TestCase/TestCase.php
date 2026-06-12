@@ -1,13 +1,13 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Test;
+namespace Gzhegow\Lib\Modules\Test\TestCase;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class TestCase
+class TestCase implements TestCaseInterface
 {
     /**
      * @var \Closure
@@ -22,15 +22,10 @@ class TestCase
      * @var resource|null
      */
     protected $resource;
-
     /**
      * @var array
      */
     protected $trace;
-    /**
-     * @var array
-     */
-    protected $refTrace;
 
     /**
      * @var string
@@ -108,7 +103,7 @@ class TestCase
      *
      * @return static
      */
-    public function resource($resource = null)
+    public function setResource($resource = null)
     {
         if ( null !== $resource ) {
             if ( ! is_resource($resource) ) {
@@ -123,16 +118,12 @@ class TestCase
         return $this;
     }
 
-
     /**
      * @return static
      */
-    public function trace(?array $trace, &$refTrace = null)
+    public function setTrace(?array $trace)
     {
-        $refTrace = null;
-
         $this->trace = $trace;
-        $this->refTrace =& $refTrace;
 
         return $this;
     }
@@ -277,21 +268,9 @@ class TestCase
         return $this->resource;
     }
 
-
-    /**
-     * @param array $refTrace
-     */
-    public function hasTrace(&$refTrace = null) : bool
+    public function getTrace() : ?array
     {
-        $refTrace = null;
-
-        if ( null !== $this->trace ) {
-            $refTrace = $this->trace;
-
-            return true;
-        }
-
-        return false;
+        return $this->trace;
     }
 
 
@@ -385,9 +364,9 @@ class TestCase
         $h = $this->getResource();
         $hasResource = (null !== $h);
 
-        false
-        || ($this->hasTrace($trace))
-        || ($trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+        $trace = null
+            ?? $this->getTrace()
+            ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
         $traceFile = (($trace[0]['file'] ?? null) ?: '{{file}}');
         $traceLine = (($trace[0]['line'] ?? null) ?: -1);

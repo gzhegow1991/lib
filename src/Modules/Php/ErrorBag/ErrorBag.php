@@ -9,7 +9,7 @@ use Gzhegow\Lib\Exception\LogicException;
 class ErrorBag
 {
     /**
-     * @var Error[]
+     * @var ErrorBagError[]
      */
     protected $errors = [];
 
@@ -43,11 +43,11 @@ class ErrorBag
      */
     public function error($error, array $tags = [], array $trace = [])
     {
-        if ( $error instanceof Error ) {
+        if ( $error instanceof ErrorBagError ) {
             $errorItem = $error;
 
         } else {
-            $errorItem = new Error();
+            $errorItem = new ErrorBagError();
             $errorItem->error = $error;
         }
 
@@ -70,7 +70,7 @@ class ErrorBag
     /**
      * @return static
      */
-    public function addError(Error $error)
+    public function addError(ErrorBagError $error)
     {
         $this->errors[] = $error;
 
@@ -79,7 +79,7 @@ class ErrorBag
 
 
     /**
-     * @return Error[]
+     * @return ErrorBagError[]
      */
     public function getErrors() : array
     {
@@ -87,7 +87,7 @@ class ErrorBag
     }
 
     /**
-     * @return Error[]
+     * @return ErrorBagError[]
      */
     public function getErrorsByTags(array $andTags, array ...$orAndTags) : array
     {
