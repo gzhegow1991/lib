@@ -21,11 +21,7 @@ class TestCase implements TestCaseInterface
     /**
      * @var resource|null
      */
-    protected $resource;
-    /**
-     * @var array
-     */
-    protected $trace;
+    protected $outputResource;
 
     /**
      * @var string
@@ -72,14 +68,6 @@ class TestCase implements TestCaseInterface
     protected $refMemoryBytes;
 
 
-    public function __construct()
-    {
-        $thePhp = Lib::php();
-
-        $this->resource = $thePhp->phpout();
-    }
-
-
     public static function new()
     {
         return new static();
@@ -101,31 +89,21 @@ class TestCase implements TestCaseInterface
 
 
     /**
-     * @param resource|null $resource
+     * @param resource|null $outputResource
      *
      * @return static
      */
-    public function setResource($resource = null)
+    public function setOutputResource($outputResource = null)
     {
-        if ( null !== $resource ) {
-            if ( ! is_resource($resource) ) {
+        if ( null !== $outputResource ) {
+            if ( ! is_resource($outputResource) ) {
                 throw new LogicException(
-                    [ 'The `resource` should be an opened resource', $resource ]
+                    [ 'The `resource` should be an opened resource', $outputResource ]
                 );
             }
         }
 
-        $this->resource = $resource;
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function setTrace(?array $trace)
-    {
-        $this->trace = $trace;
+        $this->outputResource = $outputResource;
 
         return $this;
     }
@@ -263,16 +241,11 @@ class TestCase implements TestCaseInterface
 
 
     /**
-     * @return resource|null
+     * @return resource
      */
-    public function getResource()
+    public function getOutputResource()
     {
-        return $this->resource;
-    }
-
-    public function getTrace() : ?array
-    {
-        return $this->trace;
+        return $this->outputResource ?? Lib::php()->phpout();
     }
 
 
@@ -363,13 +336,10 @@ class TestCase implements TestCaseInterface
 
         [ $fn, $fnArgs ] = $this->getFn();
 
-        $h = $this->getResource();
+        $h = $this->getOutputResource();
         $hasResource = (null !== $h);
 
-        $trace = null
-            ?? $this->getTrace()
-            ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-
+        $trace = Lib::trace();
         $traceFile = $theDebug->file_for_trace($trace[0]['file'] ?? null);
         $traceLine = $theDebug->line_for_trace($trace[0]['line'] ?? null);
 

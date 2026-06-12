@@ -789,9 +789,34 @@ class Lib
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
 
+        $traceShift = $traceShift ?? 1;
+        $withKeys = $withKeys ?? false;
+
+        if ( $traceShift < 0 ) {
+            $traceShift = 0;
+        }
+
         $theDebug = Lib::debug();
 
-        return $theDebug->file_line($refs, $traceShift, $withKeys);
+        $eTrace = array_slice($refTrace, $traceShift);
+
+        $eFile = $theDebug->file_for_trace($eTrace[0]['file'] ?? $eTrace[0][0] ?? null);
+        $eLine = $theDebug->line_for_trace($eTrace[0]['line'] ?? $eTrace[0][1] ?? null);
+
+        if ( $withKeys ) {
+            $eFileLine = [
+                'file' => $eFile,
+                'line' => $eLine,
+            ];
+
+        } else {
+            $eFileLine = [
+                $eFile,
+                $eLine,
+            ];
+        }
+
+        return $eFileLine;
     }
 
     /**
@@ -803,9 +828,39 @@ class Lib
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
 
+        $traceShift = $traceShift ?? 1;
+        $withKeys = $withKeys ?? true;
+
+        if ( $traceShift < 0 ) {
+            $traceShift = 0;
+        }
+
         $theDebug = Lib::debug();
 
-        return $theDebug->trace($refs, $traceShift, $withKeys);
+        $eTrace = array_slice($refTrace, $traceShift);
+
+        foreach ( $eTrace as $i => $eFrame ) {
+            $eFrame += [
+                'function' => null,
+                'line'     => null,
+                'file'     => null,
+                'class'    => null,
+                'object'   => null,
+                'type'     => null,
+                'args'     => null,
+            ];
+
+            $eFrame['file'] = $theDebug->file_for_trace($eFrame['file']);
+            $eFrame['line'] = $theDebug->line_for_trace($eFrame['line']);
+
+            $eTrace[$i] = $eFrame;
+        }
+
+        if ( ! $withKeys ) {
+            $eTrace = array_map('array_values', $eTrace);
+        }
+
+        return $eTrace;
     }
 
     /**
@@ -817,9 +872,55 @@ class Lib
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
 
+        $traceShift = $traceShift ?? 1;
+        $withKeys = $withKeys ?? true;
+
+        if ( $traceShift < 0 ) {
+            $traceShift = 0;
+        }
+
         $theDebug = Lib::debug();
 
-        return $theDebug->file_line_trace($refs, $traceShift, $withKeys);
+        $eTrace = array_slice($refTrace, $traceShift);
+
+        foreach ( $eTrace as $i => $eFrame ) {
+            $eFrame += [
+                'function' => null,
+                'line'     => null,
+                'file'     => null,
+                'class'    => null,
+                'object'   => null,
+                'type'     => null,
+                'args'     => null,
+            ];
+
+            $eFrame['file'] = $theDebug->file_for_trace($eFrame['file']);
+            $eFrame['line'] = $theDebug->line_for_trace($eFrame['line']);
+
+            $eTrace[$i] = $eFrame;
+        }
+
+        $eFile = $eTrace[0]['file'];
+        $eLine = $eTrace[0]['line'];
+
+        if ( $withKeys ) {
+            $eFileLine = [
+                'file' => $eFile,
+                'line' => $eLine,
+            ];
+
+        } else {
+            $eTrace = array_map('array_values', $eTrace);
+            $eFileLine = [
+                $eFile,
+                $eLine,
+            ];
+        }
+
+        return [
+            'file_line' => $eFileLine,
+            'trace'     => $eTrace,
+        ];
     }
 
 

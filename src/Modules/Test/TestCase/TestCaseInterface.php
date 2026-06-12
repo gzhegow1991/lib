@@ -11,16 +11,11 @@ interface TestCaseInterface
 
 
     /**
-     * @param resource|null $resource
+     * @param resource|null $outputResource
      *
      * @return static
      */
-    public function setResource($resource = null);
-
-    /**
-     * @return static
-     */
-    public function setTrace(?array $trace);
+    public function setOutputResource($outputResource = null);
 
 
     /**
@@ -66,9 +61,7 @@ interface TestCaseInterface
     /**
      * @return resource|null
      */
-    public function getResource();
-
-    public function getTrace() : ?array;
+    public function getOutputResource();
 
 
     /**
