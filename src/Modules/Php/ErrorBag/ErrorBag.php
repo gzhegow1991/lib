@@ -58,8 +58,10 @@ class ErrorBag
         }
 
         if ( [] !== $trace ) {
-            $errorItem->trace['file'] = (($trace['file'] ?? $trace[0] ?? null) ?: '{{file}}');
-            $errorItem->trace['line'] = (($trace['line'] ?? $trace[1] ?? null) ?: -1);
+            $theDebug = Lib::debug();
+
+            $errorItem->trace['file'] = $theDebug->file_for_trace($trace['file'] ?? $trace[0] ?? null, '');
+            $errorItem->trace['line'] = $theDebug->line_for_trace($trace['line'] ?? $trace[1] ?? null);
         }
 
         $this->errors[] = $errorItem;

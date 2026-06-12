@@ -19,13 +19,17 @@ class TestModule
     }
 
 
-    public function newCase(\Closure $fn, array $args = []) : TestCaseInterface
+    public function newCase(?\Closure $fn = null, ?array $fnArgs = null) : TestCaseInterface
     {
-        $trace = Lib::debug()->trace([], 1);
+        $trace = Lib::trace([], 1);
 
-        return TestCase::new()
-            ->fn($fn, $args)
-            ->setTrace($trace)
-        ;
+        $testCase = TestCase::new();
+        $testCase->setTrace($trace);
+
+        if ( null !== $fn ) {
+            $testCase->fn($fn, $fnArgs);
+        }
+
+        return $testCase;
     }
 }

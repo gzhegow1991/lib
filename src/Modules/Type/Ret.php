@@ -4,7 +4,6 @@ namespace Gzhegow\Lib\Modules\Type;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\Except;
-use Gzhegow\Lib\Modules\DebugModule;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\AggregateExcept;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -116,8 +115,9 @@ class Ret
                 $eFileLine = $fileLine;
                 if ( $theDebug->stateShouldTrace() ) {
                     $refs = [];
-                    $eTrace = Lib::trace($refs, 1);
-                    $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+
+                    $eTrace = Lib::trace($refs);
+                    $eFileLine = $fileLine ?? Lib::file_line($refs);
                 }
 
                 $theRet->_addLayer();
@@ -137,8 +137,9 @@ class Ret
                     $eFileLine = $fileLine;
                     if ( $theDebug->stateShouldTrace() ) {
                         $refs = [];
-                        $eTrace = Lib::trace($refs, 1);
-                        $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+
+                        $eTrace = Lib::trace($refs);
+                        $eFileLine = $fileLine ?? Lib::file_line($refs);
                     }
 
                     $theRet->_addLayer();
@@ -153,8 +154,9 @@ class Ret
             $eFileLine = $fileLine;
             if ( $theDebug->stateShouldTrace() ) {
                 $refs = [];
-                $eTrace = Lib::trace($refs, 1);
-                $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+
+                $eTrace = Lib::trace($refs);
+                $eFileLine = $fileLine ?? Lib::file_line($refs);
             }
 
             $theRet->_addError($eTrace, $eFileLine, $err, $errArgs);
@@ -295,8 +297,9 @@ class Ret
         $eFileLine = $fileLine;
         if ( $theDebug->stateShouldTrace() ) {
             $refs = [];
-            $eTrace = Lib::trace($refs, 1);
-            $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+
+            $eTrace = Lib::trace($refs);
+            $eFileLine = $fileLine ?? Lib::file_line($refs);
         }
 
         $this->_addError($eTrace, $eFileLine, $errArg, $errArgs);
@@ -313,9 +316,11 @@ class Ret
         $eFileLine = $fileLine ?: null;
 
         if ( null !== $eFileLine ) {
+            $theDebug = Lib::debug();
+
             $eFileLine = [
-                'file' => (($eFileLine['file'] ?? $eFileLine[0] ?? null) ?: '{{file}}'),
-                'line' => (($eFileLine['line'] ?? $eFileLine[1] ?? null) ?: -1),
+                'file' => $theDebug->file_for_trace($eFileLine['file'] ?? $eFileLine[0] ?? null, ''),
+                'line' => $theDebug->line_for_trace($eFileLine['line'] ?? $eFileLine[1] ?? null),
             ];
         }
 
@@ -475,8 +480,9 @@ class Ret
             $eFileLine = $fileLine;
             if ( $theDebug->stateShouldTrace() ) {
                 $refs = [];
-                $eTrace = Lib::trace($refs, 1);
-                $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+
+                $eTrace = Lib::trace($refs);
+                $eFileLine = $fileLine ?? Lib::file_line($refs);
             }
 
             $this->_addLayer();
@@ -508,8 +514,9 @@ class Ret
             $eFileLine = $fileLine;
             if ( $theDebug->stateShouldTrace() ) {
                 $refs = [];
-                $eTrace = Lib::trace($refs, 1);
-                $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+
+                $eTrace = Lib::trace($refs);
+                $eFileLine = $fileLine ?? Lib::file_line($refs);
             }
 
             $this->_addLayer();

@@ -4,6 +4,7 @@
 
 namespace Gzhegow\Lib\Modules\Debug\Throwabler;
 
+use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\ExceptInterface;
 use Gzhegow\Lib\Exception\Iterator\ExceptionIterator;
@@ -533,18 +534,22 @@ class DefaultDebugThrowabler implements DebugThrowablerInterface
             $throwable, $flags
         );
 
-        foreach ( $trace as $traceItem ) {
-            $phpFile = (($traceItem['file'] ?? null) ?: '{{file}}');
-            $phpLine = (($traceItem['line'] ?? null) ?: -1);
+        if ( [] !== $trace ) {
+            $theDebug = Lib::debug();
 
-            $phpClass = $traceItem['class'] ?? '';
-            $phpType = $traceItem['type'] ?? '';
-            $phpFunction = $traceItem['function'] ?? '';
+            foreach ( $trace as $t ) {
+                $phpFile = $theDebug->file_for_trace($t['file'] ?? null);
+                $phpLine = $theDebug->line_for_trace($t['line'] ?? null);
 
-            $phpFn = array_filter([ $phpClass, $phpType, $phpFunction ]) ?: [];
-            $phpFn = $phpFn ? implode('', $phpFn) : '{function}';
+                $phpClass = $t['class'] ?? '';
+                $phpType = $t['type'] ?? '';
+                $phpFunction = $t['function'] ?? '';
 
-            $lines[] = "{$phpFile} : {$phpLine} : {$phpFn}";
+                $phpFn = array_filter([ $phpClass, $phpType, $phpFunction ]) ?: [];
+                $phpFn = $phpFn ? implode('', $phpFn) : '{function}';
+
+                $lines[] = "{$phpFile} : {$phpLine} : {$phpFn}";
+            }
         }
 
         return $lines;

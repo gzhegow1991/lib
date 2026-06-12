@@ -14,6 +14,9 @@ use Gzhegow\Lib\Modules\Debug\Backtracer\DebugBacktracerInterface;
 
 class DebugModule
 {
+    const FILE_DEFAULT = '{{file}}';
+    const LINE_DEFAULT = -1;
+
     const VAR_DUMP_OPT_ARRAY_INDENT     = 'array_indent';
     const VAR_DUMP_OPT_ARRAY_LEVEL_MAX  = 'array_level_max';
     const VAR_DUMP_OPT_ARRAY_NEWLINE    = 'array_newline';
@@ -313,11 +316,11 @@ class DebugModule
      */
     public function file_line(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
     {
-        $refTrace =& $refs[0];
+        if ( array_key_exists(0, $refs) ) $refTrace =& $refs[0];
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
 
-        $traceShift = $traceShift ?? 0;
+        $traceShift = $traceShift ?? 1;
         $withKeys = $withKeys ?? false;
 
         if ( $traceShift < 0 ) {
@@ -326,22 +329,8 @@ class DebugModule
 
         $eTrace = array_slice($refTrace, $traceShift);
 
-        $eFile = (($eTrace[0]['file'] ?? $eTrace[0][0] ?? null) ?: '{{file}}');
-        $eLine = (($eTrace[0]['line'] ?? $eTrace[0][1] ?? null) ?: -1);
-
-        if ( '{{file}}' !== $eFile ) {
-            $theDebug = Lib::debug();
-
-            $dirRoot = $theDebug->stateDirRoot();
-
-            if ( null !== $dirRoot ) {
-                $eFile = str_replace(
-                    $dirRoot . DIRECTORY_SEPARATOR,
-                    '',
-                    $eFile
-                );
-            }
-        }
+        $eFile = $this->file_for_trace($eTrace[0]['file'] ?? $eTrace[0][0] ?? null);
+        $eLine = $this->line_for_trace($eTrace[0]['line'] ?? $eTrace[0][1] ?? null);
 
         if ( $withKeys ) {
             $eFileLine = [
@@ -364,11 +353,11 @@ class DebugModule
      */
     public function trace(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
     {
-        $refTrace =& $refs[0];
+        if ( array_key_exists(0, $refs) ) $refTrace =& $refs[0];
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
 
-        $traceShift = $traceShift ?? 0;
+        $traceShift = $traceShift ?? 1;
         $withKeys = $withKeys ?? true;
 
         if ( $traceShift < 0 ) {
@@ -388,25 +377,8 @@ class DebugModule
                 'args'     => null,
             ];
 
-            $eFrameFile = $eFrame['file'] ?: '{{file}}';
-            $eFrameLine = $eFrame['line'] ?: -1;
-
-            if ( '{{file}}' !== $eFrameFile ) {
-                $theDebug = Lib::debug();
-
-                $dirRoot = $theDebug->stateDirRoot();
-
-                if ( null !== $dirRoot ) {
-                    $eFrameFile = str_replace(
-                        $dirRoot . DIRECTORY_SEPARATOR,
-                        '',
-                        $eFrameFile
-                    );
-                }
-            }
-
-            $eFrame['file'] = $eFrameFile;
-            $eFrame['line'] = $eFrameLine;
+            $eFrame['file'] = $this->file_for_trace($eFrame['file']);
+            $eFrame['line'] = $this->file_for_trace($eFrame['line']);
 
             $eTrace[$i] = $eFrame;
         }
@@ -423,11 +395,11 @@ class DebugModule
      */
     public function file_line_trace(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
     {
-        $refTrace =& $refs[0];
+        if ( array_key_exists(0, $refs) ) $refTrace =& $refs[0];
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
 
-        $traceShift = $traceShift ?? 0;
+        $traceShift = $traceShift ?? 1;
         $withKeys = $withKeys ?? true;
 
         if ( $traceShift < 0 ) {
@@ -447,26 +419,8 @@ class DebugModule
                 'args'     => null,
             ];
 
-            $eFrameFile = $eFrame['file'] ?: '{{file}}';
-            $eFrameLine = $eFrame['line'] ?: -1;
-
-            if ( '{{file}}' !== $eFrameFile ) {
-                $theDebug = Lib::debug();
-
-                $dirRoot = $theDebug->stateDirRoot();
-
-                if ( null !== $dirRoot ) {
-                    $eFrameFile = str_replace(
-                        $dirRoot . DIRECTORY_SEPARATOR,
-                        '',
-                        $eFrameFile
-                    );
-
-                }
-            }
-
-            $eFrame['file'] = $eFrameFile;
-            $eFrame['line'] = $eFrameLine;
+            $eFrame['file'] = $this->file_for_trace($eFrame['file']);
+            $eFrame['line'] = $this->file_for_trace($eFrame['line']);
 
             $eTrace[$i] = $eFrame;
         }
@@ -492,6 +446,44 @@ class DebugModule
             'file_line' => $eFileLine,
             'trace'     => $eTrace,
         ];
+    }
+
+    public function file_for_trace(?string $file, ?string $dirRoot = null) : string
+    {
+        if ( null === $file ) {
+            return static::FILE_DEFAULT;
+        }
+
+        if ( '' === $file ) {
+            return static::FILE_DEFAULT;
+        }
+
+        $dirRootString = $dirRoot ?? Lib::debug()->stateDirRoot() ?? '';
+
+        $fileString = str_replace('\\', '/', $file);
+
+        if ( '' === $dirRootString ) {
+            return $fileString;
+        }
+
+        $dirRootString = str_replace('\\', '/', $dirRootString);
+
+        $fileString = str_replace([ $dirRootString . '/', $dirRootString ], '', $fileString);
+
+        return $fileString;
+    }
+
+    public function line_for_trace(?int $line)
+    {
+        if ( null === $line ) {
+            return static::LINE_DEFAULT;
+        }
+
+        if ( $line < 1 ) {
+            return static::LINE_DEFAULT;
+        }
+
+        return $line;
     }
 
 
@@ -2255,7 +2247,7 @@ class DebugModule
 
     public function dp($var, ...$vars) : string
     {
-        $fileLine = Lib::file_line([], 1);
+        $fileLine = Lib::file_line();
 
         return $this->dumper()->dp($fileLine, $var, ...$vars);
     }
@@ -2271,7 +2263,7 @@ class DebugModule
      */
     public function d($var, ...$vars)
     {
-        $fileLine = Lib::file_line([], 1);
+        $fileLine = Lib::file_line();
 
         return $this->dumper()->d($fileLine, $var, ...$vars);
     }
@@ -2281,7 +2273,7 @@ class DebugModule
      */
     public function dd(...$vars)
     {
-        $fileLine = Lib::file_line([], 1);
+        $fileLine = Lib::file_line();
 
         return $this->dumper()->dd($fileLine, ...$vars);
     }
@@ -2302,7 +2294,7 @@ class DebugModule
      */
     public function td(int $throttleMs, $var, ...$vars)
     {
-        $fileLine = Lib::file_line([], 1);
+        $fileLine = Lib::file_line();
 
         return $this->dumper()->td($fileLine, $throttleMs, $var, ...$vars);
     }

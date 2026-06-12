@@ -135,7 +135,7 @@ class CurlModule
     }
 
 
-    public function newCurlProcess() : CurlProcess
+    public function newProcess() : CurlProcess
     {
         $instance = CurlProcess::new();
 
@@ -145,7 +145,7 @@ class CurlModule
         return $instance;
     }
 
-    public function newCurlItem() : CurlItem
+    public function newItem() : CurlItem
     {
         $instance = CurlItem::new();
 
@@ -163,7 +163,7 @@ class CurlModule
      */
     public function execSingle(array $curlItems) : \Generator
     {
-        $cp = $this->newCurlProcess();
+        $cp = $this->newProcess();
 
         foreach ( $curlItems as $curlItem ) {
             if ( $curlItem instanceof CurlItem ) {
@@ -174,7 +174,7 @@ class CurlModule
 
                 $dataType = $dataType ?? 'raw';
 
-                $curlItem = $this->newCurlItem();
+                $curlItem = $this->newItem();
                 $curlItem->setUrl($url);
 
                 if ( null !== $method ) $curlItem->setMethod($method);
@@ -185,7 +185,7 @@ class CurlModule
             } elseif ( is_string($curlItem) ) {
                 $url = $curlItem;
 
-                $curlItem = $this->newCurlItem();
+                $curlItem = $this->newItem();
                 $curlItem->setUrl($url);
             }
 
@@ -202,7 +202,7 @@ class CurlModule
      */
     public function execMulti(array $curlItems) : \Generator
     {
-        $cp = $this->newCurlProcess();
+        $cp = $this->newProcess();
 
         foreach ( $curlItems as $curlItem ) {
             if ( $curlItem instanceof CurlItem ) {
@@ -213,7 +213,7 @@ class CurlModule
 
                 $dataType = $dataType ?? 'raw';
 
-                $curlItem = $this->newCurlItem();
+                $curlItem = $this->newItem();
                 $curlItem->setUrl($url);
 
                 if ( null !== $method ) $curlItem->setMethod($method);
@@ -224,7 +224,7 @@ class CurlModule
             } elseif ( is_string($curlItem) ) {
                 $url = $curlItem;
 
-                $curlItem = $this->newCurlItem();
+                $curlItem = $this->newItem();
                 $curlItem->setUrl($url);
             }
 
@@ -241,7 +241,7 @@ class CurlModule
      */
     public function execBatch(int $batchSize, array $curlItems) : \Generator
     {
-        $cp = $this->newCurlProcess();
+        $cp = $this->newProcess();
 
         foreach ( $curlItems as $curlItem ) {
             if ( $curlItem instanceof CurlItem ) {
@@ -252,7 +252,7 @@ class CurlModule
 
                 $dataType = $dataType ?? 'raw';
 
-                $curlItem = $this->newCurlItem();
+                $curlItem = $this->newItem();
                 $curlItem->setUrl($url);
 
                 if ( null !== $method ) $curlItem->setMethod($method);
@@ -263,7 +263,7 @@ class CurlModule
             } elseif ( is_string($curlItem) ) {
                 $url = $curlItem;
 
-                $curlItem = $this->newCurlItem();
+                $curlItem = $this->newItem();
                 $curlItem->setUrl($url);
             }
 

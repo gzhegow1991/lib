@@ -89,10 +89,12 @@ class TestCase implements TestCaseInterface
     /**
      * @return static
      */
-    public function fn(\Closure $fn, array $args = [])
+    public function fn(\Closure $fn, ?array $fnArgs = null)
     {
+        $fnArgs = $fnArgs ?? [];
+
         $this->fn = $fn;
-        $this->fnArgs = $args;
+        $this->fnArgs = $fnArgs;
 
         return $this;
     }
@@ -368,8 +370,8 @@ class TestCase implements TestCaseInterface
             ?? $this->getTrace()
             ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
-        $traceFile = (($trace[0]['file'] ?? null) ?: '{{file}}');
-        $traceLine = (($trace[0]['line'] ?? null) ?: -1);
+        $traceFile = $theDebug->file_for_trace($trace[0]['file'] ?? null);
+        $traceLine = $theDebug->line_for_trace($trace[0]['line'] ?? null);
 
         $memoryBytesBefore = memory_get_usage();
         $secondsBefore = microtime(true);

@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Exception;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\DebugModule;
 
 
 class Except implements
@@ -46,8 +45,8 @@ class Except implements
             $exTraceShift = array_shift($exTrace);
 
             $eArgsTrace = $exTrace;
-            $eArgsFile = (($eArgsFile ?? $exTrace[0]['file'] ?? $exTraceShift['file'] ?? null) ?: '{{file}}');
-            $eArgsLine = (($eArgsLine ?? $exTrace[0]['line'] ?? $exTraceShift['line'] ?? null) ?: -1);
+            $eArgsFile = $theDebug->file_for_trace($eArgsFile ?? $exTrace[0]['file'] ?? $exTraceShift['file'] ?? null, '');
+            $eArgsLine = $theDebug->line_for_trace($eArgsLine ?? $exTrace[0]['line'] ?? $exTraceShift['line'] ?? null, '');
         }
 
         $this->message = $eArgsMessage;

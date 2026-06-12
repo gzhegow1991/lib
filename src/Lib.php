@@ -34,8 +34,6 @@ use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
-use Gzhegow\Lib\Modules\Test\TestCase\TestCase;
-use Gzhegow\Lib\Modules\Func\Pipe\FuncPipe;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\EntrypointModule;
@@ -44,31 +42,33 @@ use Gzhegow\Lib\Modules\Format\FormatXml;
 use Gzhegow\Lib\Modules\Curl\CurlProcess;
 use Gzhegow\Lib\Modules\Format\FormatJson;
 use Gzhegow\Lib\Modules\Format\FormatHtml;
+use Gzhegow\Lib\Modules\Func\Pipe\FuncPipe;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Format\FormatBaseN;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
+use Gzhegow\Lib\Modules\Test\TestCase\TestCase;
 use Gzhegow\Lib\Modules\Format\FormatSerialize;
 use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafeProxy;
 use Gzhegow\Lib\Modules\Php\Microtimer\Microtimer;
-use Gzhegow\Lib\Modules\Debug\Dumper\DebugDumperInterface;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
 use Gzhegow\Lib\Modules\Fs\SocketSafe\SocketSafeProxy;
 use Gzhegow\Lib\Modules\Fs\StreamSafe\StreamSafeProxy;
-use Gzhegow\Lib\Modules\Func\Invoker\FuncInvokerInterface;
 use Gzhegow\Lib\Modules\Http\Cookies\CookiesInterface;
-use Gzhegow\Lib\Modules\Async\Loop\AsyncLoopManagerInterface;
-use Gzhegow\Lib\Modules\Async\FetchApi\AsyncFetchApiInterface;
 use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
-use Gzhegow\Lib\Modules\Async\Clock\AsyncClockManagerInterface;
+use Gzhegow\Lib\Modules\Debug\Dumper\DebugDumperInterface;
+use Gzhegow\Lib\Modules\Func\Invoker\FuncInvokerInterface;
 use Gzhegow\Lib\Modules\Php\Process\ProcessManagerInterface;
-use Gzhegow\Lib\Modules\Debug\Backtracer\DebugBacktracerInterface;
-use Gzhegow\Lib\Modules\Debug\Throwabler\DebugThrowablerInterface;
+use Gzhegow\Lib\Modules\Async\Loop\AsyncLoopManagerInterface;
 use Gzhegow\Lib\Modules\Test\TestDumper\TestPrinterInterface;
-use Gzhegow\Lib\Modules\Async\Promise\AsyncPromiseManagerInterface;
+use Gzhegow\Lib\Modules\Async\FetchApi\AsyncFetchApiInterface;
+use Gzhegow\Lib\Modules\Async\Clock\AsyncClockManagerInterface;
 use Gzhegow\Lib\Modules\Str\Interpolator\InterpolatorInterface;
 use Gzhegow\Lib\Modules\Social\EmailParser\EmailParserInterface;
+use Gzhegow\Lib\Modules\Debug\Backtracer\DebugBacktracerInterface;
+use Gzhegow\Lib\Modules\Debug\Throwabler\DebugThrowablerInterface;
 use Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafeProxy;
 use Gzhegow\Lib\Modules\Social\PhoneManager\PhoneManagerInterface;
+use Gzhegow\Lib\Modules\Async\Promise\AsyncPromiseManagerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
@@ -579,7 +579,7 @@ class Lib
      */
     public static function newCurl(&$ref = null)
     {
-        return $ref = Lib::curl()->newCurlProcess();
+        return $ref = Lib::curl()->newProcess();
     }
 
     /**
@@ -785,36 +785,13 @@ class Lib
      */
     public static function file_line(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
     {
-        $refTrace =& $refs[0];
+        if ( array_key_exists(0, $refs) ) $refTrace =& $refs[0];
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
 
-        $traceShift = $traceShift ?? 0;
-        $withKeys = $withKeys ?? false;
+        $theDebug = Lib::debug();
 
-        if ( $traceShift < 0 ) {
-            $traceShift = 0;
-        }
-
-        $eTrace = array_slice($refTrace, $traceShift);
-
-        $eFile = (($eTrace[0]['file'] ?? $eTrace[0][0] ?? null) ?: '{{file}}');
-        $eLine = (($eTrace[0]['line'] ?? $eTrace[0][1] ?? null) ?: -1);
-
-        if ( $withKeys ) {
-            $eFileLine = [
-                'file' => $eFile,
-                'line' => $eLine,
-            ];
-
-        } else {
-            $eFileLine = [
-                $eFile,
-                $eLine,
-            ];
-        }
-
-        return $eFileLine;
+        return $theDebug->file_line($refs, $traceShift, $withKeys);
     }
 
     /**
@@ -822,38 +799,13 @@ class Lib
      */
     public static function trace(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
     {
-        $refTrace =& $refs[0];
+        if ( array_key_exists(0, $refs) ) $refTrace =& $refs[0];
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
 
-        $traceShift = $traceShift ?? 0;
-        $withKeys = $withKeys ?? true;
+        $theDebug = Lib::debug();
 
-        if ( $traceShift < 0 ) {
-            $traceShift = 0;
-        }
-
-        $eTrace = array_slice($refTrace, $traceShift);
-
-        foreach ( $eTrace as $i => $eFrame ) {
-            $eTrace[$i] = []
-                + $eFrame
-                + [
-                    'function' => null,
-                    'line'     => null,
-                    'file'     => null,
-                    'class'    => null,
-                    'object'   => null,
-                    'type'     => null,
-                    'args'     => null,
-                ];
-        }
-
-        if ( ! $withKeys ) {
-            $eTrace = array_map('array_values', $eTrace);
-        }
-
-        return $eTrace;
+        return $theDebug->trace($refs, $traceShift, $withKeys);
     }
 
     /**
@@ -861,57 +813,13 @@ class Lib
      */
     public static function file_line_trace(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
     {
-        $refTrace =& $refs[0];
+        if ( array_key_exists(0, $refs) ) $refTrace =& $refs[0];
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
 
-        $traceShift = $traceShift ?? 0;
-        $withKeys = $withKeys ?? true;
+        $theDebug = Lib::debug();
 
-        if ( $traceShift < 0 ) {
-            $traceShift = 0;
-        }
-
-        $eTrace = array_slice($refTrace, $traceShift);
-
-        $eFile = (($eTrace[0]['file'] ?? $eTrace[0][0] ?? null) ?: '{{file}}');
-        $eLine = (($eTrace[0]['line'] ?? $eTrace[0][1] ?? null) ?: -1);
-
-        if ( $withKeys ) {
-            $eFileLine = [
-                'file' => $eFile,
-                'line' => $eLine,
-            ];
-
-        } else {
-            $eFileLine = [
-                $eFile,
-                $eLine,
-            ];
-        }
-
-        foreach ( $eTrace as $i => $eFrame ) {
-            $eTrace[$i] = []
-                + $eFrame
-                + [
-                    'function' => null,
-                    'line'     => null,
-                    'file'     => null,
-                    'class'    => null,
-                    'object'   => null,
-                    'type'     => null,
-                    'args'     => null,
-                ];
-        }
-
-        if ( ! $withKeys ) {
-            $eTrace = array_map('array_values', $eTrace);
-        }
-
-        return [
-            'file_line' => $eFileLine,
-            'trace'     => $eTrace,
-        ];
+        return $theDebug->file_line_trace($refs, $traceShift, $withKeys);
     }
 
 
@@ -1052,7 +960,7 @@ class Lib
 
     public static function dp($var, ...$vars) : string
     {
-        $fileLine = Lib::file_line([], 1);
+        $fileLine = Lib::file_line();
 
         return Lib::debug()->dumper()->dp($fileLine, $var, ...$vars);
     }
@@ -1068,7 +976,7 @@ class Lib
      */
     public static function d($var, ...$vars)
     {
-        $fileLine = Lib::file_line([], 1);
+        $fileLine = Lib::file_line();
 
         return Lib::debug()->dumper()->d($fileLine, $var, ...$vars);
     }
@@ -1078,7 +986,7 @@ class Lib
      */
     public static function dd(...$vars)
     {
-        $fileLine = Lib::file_line([], 1);
+        $fileLine = Lib::file_line();
 
         return Lib::debug()->dumper()->dd($fileLine, ...$vars);
     }
@@ -1099,7 +1007,7 @@ class Lib
      */
     public function td(int $throttleMs, $var, ...$vars)
     {
-        $fileLine = Lib::file_line([], 1);
+        $fileLine = Lib::file_line();
 
         return Lib::debug()->dumper()->td($fileLine, $throttleMs, $var, ...$vars);
     }
@@ -1115,7 +1023,7 @@ class Lib
      */
     public static function zd(?int $zTimes, $var, ...$vars)
     {
-        $fileLine = Lib::file_line([], 1);
+        $fileLine = Lib::file_line();
 
         return Lib::debug()->dumper()->zd($fileLine, $zTimes, $var, ...$vars);
     }

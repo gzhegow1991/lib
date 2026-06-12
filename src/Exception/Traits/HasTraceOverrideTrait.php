@@ -32,36 +32,12 @@ trait HasTraceOverrideTrait
 
     public function getFileOverride(?string $dirRoot = null) : ?string
     {
-        if ( null === $dirRoot ) {
-            $theDebug = Lib::debug();
-
-            $dirRoot = $theDebug->stateDirRoot();
-        }
-
         $file = $this->fileOverride;
 
         if ( null !== $file ) {
-            if ( null !== $dirRoot ) {
-                $refCount = 0;
+            $theDebug = Lib::debug();
 
-                if ( 0 === $refCount ) {
-                    $file = str_replace(
-                        $dirRoot . DIRECTORY_SEPARATOR,
-                        '',
-                        $file,
-                        //
-                        $refCount
-                    );
-                }
-
-                if ( 0 === $refCount ) {
-                    $file = str_replace(
-                        str_replace([ '/', '\\' ], '/', $dirRoot) . '/',
-                        '',
-                        str_replace([ '/', '\\' ], '/', $file)
-                    );
-                }
-            }
+            $file = $theDebug->file_for_trace($file, $dirRoot);
         }
 
         return $file;
@@ -111,44 +87,14 @@ trait HasTraceOverrideTrait
 
     public function getTraceOverride(?string $dirRoot = null) : ?array
     {
-        if ( null === $dirRoot ) {
-            $theDebug = Lib::debug();
-
-            $dirRoot = $theDebug->stateDirRoot();
-        }
-
         $trace = $this->traceOverride;
 
         if ( null !== $trace ) {
-            if ( null !== $dirRoot ) {
-                foreach ( $trace as $i => $t ) {
-                    $tFile = (($t['file'] ?? null) ?: '{{file}}');
-                    $tLine = (($t['line'] ?? null) ?: -1);
+            $theDebug = Lib::debug();
 
-                    if ( '{{file}}' !== $tFile ) {
-                        $refCount = 0;
-
-                        if ( 0 === $refCount ) {
-                            $tFile = str_replace(
-                                $dirRoot . DIRECTORY_SEPARATOR,
-                                '',
-                                $tFile,
-                                $refCount
-                            );
-                        }
-
-                        if ( 0 === $refCount ) {
-                            $tFile = str_replace(
-                                str_replace([ '/', '\\' ], '/', $dirRoot) . '/',
-                                '',
-                                str_replace([ '/', '\\' ], '/', $tFile)
-                            );
-                        }
-                    }
-
-                    $trace[$i]['file'] = $tFile;
-                    $trace[$i]['line'] = $tLine;
-                }
+            foreach ( $trace as $i => $t ) {
+                $trace[$i]['file'] = $theDebug->file_for_trace($t['file'] ?? null, $dirRoot);
+                $trace[$i]['line'] = $theDebug->line_for_trace($t['line'] ?? null);
             }
         }
 
@@ -157,12 +103,6 @@ trait HasTraceOverrideTrait
 
     public function getTraceAsStringOverride(?string $dirRoot = null) : ?string
     {
-        if ( null === $dirRoot ) {
-            $theDebug = Lib::debug();
-
-            $dirRoot = $theDebug->stateDirRoot();
-        }
-
         $trace = $this->traceOverride;
         $traceAsString = null;
 
@@ -171,67 +111,46 @@ trait HasTraceOverrideTrait
                 $traceAsString = "#0 {main}";
 
             } else {
+                $theDebug = Lib::debug();
+
                 $index = 0;
                 foreach ( $trace as $t ) {
-                    $args = "";
+                    $tArgs = "";
 
-                    $tFile = (($t['file'] ?? null) ?: '{{file}}');
-                    $tLine = (($t['line'] ?? null) ?: -1);
-
-                    if ( '{{file}}' !== $tFile ) {
-                        if ( null !== $dirRoot ) {
-                            $refCount = 0;
-
-                            if ( 0 === $refCount ) {
-                                $tFile = str_replace(
-                                    $dirRoot . DIRECTORY_SEPARATOR,
-                                    '',
-                                    $tFile,
-                                    $refCount
-                                );
-                            }
-
-                            if ( 0 === $refCount ) {
-                                $tFile = str_replace(
-                                    str_replace([ '/', '\\' ], '/', $dirRoot) . '/',
-                                    '',
-                                    str_replace([ '/', '\\' ], '/', $tFile)
-                                );
-                            }
-                        }
-                    }
+                    $tFile = $theDebug->file_for_trace($t['file'] ?? null, $dirRoot);
+                    $tLine = $theDebug->line_for_trace($t['line'] ?? null);
 
                     if ( isset($t['args']) ) {
-                        $args = [];
+                        $tArgs = [];
 
                         foreach ( $t['args'] as $arg ) {
                             if ( is_null($arg) ) {
-                                $args[] = '{ NULL }';
+                                $tArgs[] = '{ NULL }';
 
                             } elseif ( is_bool($arg) ) {
-                                $args[] = ($arg) ? "{ TRUE }" : "{ FALSE }";
+                                $tArgs[] = ($arg) ? "{ TRUE }" : "{ FALSE }";
 
                             } elseif ( is_string($arg) ) {
-                                $args[] = '"' . $arg . '"';
+                                $tArgs[] = '"' . $arg . '"';
 
                             } elseif ( is_array($arg) ) {
-                                $args[] = "{ array(" . count($arg) . ") }";
+                                $tArgs[] = "{ array(" . count($arg) . ") }";
 
                             } elseif ( is_object($arg) ) {
-                                $args[] = get_class($arg);
+                                $tArgs[] = get_class($arg);
 
                             } elseif ( false
                                 || is_resource($arg)
                                 || ('resource (closed)' === gettype($arg))
                             ) {
-                                $args[] = get_resource_type($arg);
+                                $tArgs[] = get_resource_type($arg);
 
                             } else {
-                                $args[] = $arg;
+                                $tArgs[] = $arg;
                             }
                         }
 
-                        $args = join(", ", $args);
+                        $tArgs = join(", ", $tArgs);
                     }
 
                     $traceAsString .= sprintf(
@@ -246,7 +165,7 @@ trait HasTraceOverrideTrait
                         $t['type'] ?? '',  // > "->" or "::"
                         $t['function'],    // > function_name
                         //
-                        $args
+                        $tArgs
                     );
 
                     $index++;

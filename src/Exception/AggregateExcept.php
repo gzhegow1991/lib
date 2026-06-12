@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Exception;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\DebugModule;
 
 
 class AggregateExcept implements
@@ -41,8 +40,8 @@ class AggregateExcept implements
             $exTraceShift = array_shift($exTrace);
 
             $eTrace = $exTrace;
-            $eFile = (($exTrace[0]['file'] ?? $exTraceShift['file'] ?? null) ?: '{{file}}');
-            $eLine = (($exTrace[0]['line'] ?? $exTraceShift['line'] ?? null) ?: -1);
+            $eFile = $theDebug->file_for_trace($exTrace[0]['file'] ?? $exTraceShift['file'] ?? null, '');
+            $eLine = $theDebug->line_for_trace($exTrace[0]['line'] ?? $exTraceShift['line'] ?? null);
         }
 
         $throwablesCnt = count($throwables);

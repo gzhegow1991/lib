@@ -3,6 +3,9 @@
 namespace Gzhegow\Lib\Exception\Traits;
 
 
+use Gzhegow\Lib\Lib;
+
+
 /**
  * @see HasTraceInterface
  */
@@ -24,14 +27,18 @@ trait HasTraceTrait
 
     public function getFile() : string
     {
-        $file = $this->file ?: '{{file}}';
+        $theDebug = Lib::debug();
+
+        $file = $theDebug->file_for_trace($this->file);
 
         return $file;
     }
 
     public function getLine() : int
     {
-        $line = $this->line ?: -1;
+        $theDebug = Lib::debug();
+
+        $line = $theDebug->line_for_trace($this->line);
 
         return $line;
     }
@@ -40,6 +47,15 @@ trait HasTraceTrait
     public function getTrace() : array
     {
         $trace = $this->trace ?? [];
+
+        if ( [] !== $trace ) {
+            $theDebug = Lib::debug();
+
+            foreach ( $trace as $i => $t ) {
+                $trace[$i]['file'] = $theDebug->file_for_trace($t['file'] ?? null);
+                $trace[$i]['line'] = $theDebug->line_for_trace($t['line'] ?? null);
+            }
+        }
 
         return $trace;
     }
@@ -54,44 +70,46 @@ trait HasTraceTrait
             $traceAsString = "#0 {main}";
 
         } else {
+            $theDebug = Lib::debug();
+
             $index = 0;
-            foreach ( $trace as $frame ) {
-                $args = "";
+            foreach ( $trace as $t ) {
+                $tArgs = "";
 
-                $file = (($frame['file'] ?? null) ?: '{{file}}');
-                $line = (($frame['line'] ?? null) ?: -1);
+                $tFile = $theDebug->file_for_trace($t['file'] ?? null);
+                $tLine = $theDebug->line_for_trace($t['line'] ?? null);
 
-                if ( isset($frame['args']) ) {
-                    $args = [];
+                if ( isset($t['args']) ) {
+                    $tArgs = [];
 
-                    foreach ( $frame['args'] as $arg ) {
+                    foreach ( $t['args'] as $arg ) {
                         if ( is_null($arg) ) {
-                            $args[] = '{ NULL }';
+                            $tArgs[] = '{ NULL }';
 
                         } elseif ( is_bool($arg) ) {
-                            $args[] = ($arg) ? "{ TRUE }" : "{ FALSE }";
+                            $tArgs[] = ($arg) ? "{ TRUE }" : "{ FALSE }";
 
                         } elseif ( is_string($arg) ) {
-                            $args[] = '"' . $arg . '"';
+                            $tArgs[] = '"' . $arg . '"';
 
                         } elseif ( is_array($arg) ) {
-                            $args[] = "{ array(" . count($arg) . ") }";
+                            $tArgs[] = "{ array(" . count($arg) . ") }";
 
                         } elseif ( is_object($arg) ) {
-                            $args[] = get_class($arg);
+                            $tArgs[] = get_class($arg);
 
                         } elseif ( false
                             || is_resource($arg)
                             || ('resource (closed)' === gettype($arg))
                         ) {
-                            $args[] = get_resource_type($arg);
+                            $tArgs[] = get_resource_type($arg);
 
                         } else {
-                            $args[] = $arg;
+                            $tArgs[] = $arg;
                         }
                     }
 
-                    $args = join(", ", $args);
+                    $tArgs = join(", ", $tArgs);
                 }
 
                 $traceAsString .= sprintf(
@@ -99,14 +117,14 @@ trait HasTraceTrait
                     //
                     $index,
                     //
-                    $file,
-                    $line,
+                    $tFile,
+                    $tLine,
                     //
-                    $frame['class'] ?? '', // > className
-                    $frame['type'] ?? '',  // > "->" or "::"
-                    $frame['function'],    // > function_name
+                    $t['class'] ?? '', // > className
+                    $t['type'] ?? '',  // > "->" or "::"
+                    $t['function'],    // > function_name
                     //
-                    $args
+                    $tArgs
                 );
 
                 $index++;

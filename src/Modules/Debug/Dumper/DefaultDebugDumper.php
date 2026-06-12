@@ -879,7 +879,7 @@ class DefaultDebugDumper implements DebugDumperInterface
 
     public function dp(?array $fileLine, $var, ...$vars) : string
     {
-        $fileLine = $fileLine ?? Lib::file_line([], 1);
+        $fileLine = $fileLine ?? Lib::file_line();
 
         return $this->doPrinterPrintTrace($fileLine, $var, ...$vars);
     }
@@ -902,7 +902,7 @@ class DefaultDebugDumper implements DebugDumperInterface
      */
     public function d(?array $fileLine, $var, ...$vars)
     {
-        $fileLine = $fileLine ?? Lib::file_line([], 1);
+        $fileLine = $fileLine ?? Lib::file_line();
 
         $this->doDumperEchoTrace($fileLine, $var, ...$vars);
 
@@ -916,7 +916,7 @@ class DefaultDebugDumper implements DebugDumperInterface
      */
     public function dd(?array $fileLine, ...$vars)
     {
-        $fileLine = $fileLine ?? Lib::file_line([], 1);
+        $fileLine = $fileLine ?? Lib::file_line();
 
         $this->doDumperEchoTrace($fileLine, ...$vars);
 
@@ -954,7 +954,7 @@ class DefaultDebugDumper implements DebugDumperInterface
      */
     public function td(?array $fileLine, int $throttleMs, $var, ...$vars)
     {
-        $fileLine = $fileLine ?? Lib::file_line([], 1);
+        $fileLine = $fileLine ?? Lib::file_line();
 
         if ( $throttleMs < 0 ) {
             throw new LogicException(
@@ -1001,7 +1001,7 @@ class DefaultDebugDumper implements DebugDumperInterface
      */
     public function zd(?array $fileLine, int $zTimes, $var, ...$vars)
     {
-        $fileLine = $fileLine ?? Lib::file_line([], 1);
+        $fileLine = $fileLine ?? Lib::file_line();
 
         if ( $zTimes < 1 ) {
             throw new LogicException(

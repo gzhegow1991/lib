@@ -433,8 +433,6 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
     {
         $theDebug = Lib::debug();
 
-        $dirRoot = $theDebug->stateDirRoot();
-
         $trace = $this->trace;
 
         $debugBacktraceOptions = null;
@@ -471,8 +469,8 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
                 'args'     => null,
             ];
 
-            $t['file'] = $t['file'] ?: '{{file}}';
-            $t['line'] = $t['line'] ?: -1;
+            $t['file'] = $theDebug->file_for_trace($t['file'] ?? null);
+            $t['line'] = $theDebug->line_for_trace($t['line'] ?? null);
 
             if ( $hasOf || $hasOfStartsWith ) {
                 $tFile = $t['file'];
@@ -652,18 +650,6 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
                         }
                     }
                 }
-            }
-
-            if ( null !== $dirRoot ) {
-                $tFile = $t['file'];
-
-                $tFile = str_replace(
-                    $dirRoot . DIRECTORY_SEPARATOR,
-                    '',
-                    $tFile
-                );
-
-                $t['file'] = $tFile;
             }
 
             $trace[$i] = $t;

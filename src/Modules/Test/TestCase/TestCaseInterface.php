@@ -7,7 +7,7 @@ interface TestCaseInterface
     /**
      * @return static
      */
-    public function fn(\Closure $fn, array $args = []);
+    public function fn(\Closure $fn, array $fnArgs = []);
 
 
     /**
