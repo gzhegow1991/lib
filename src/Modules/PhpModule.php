@@ -2403,7 +2403,15 @@ class PhpModule
     {
         $theType = Lib::type();
 
-        $valueString = $theType->string_not_empty($value)->orThrow();
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
         if ( null === $segments ) {
             $pattern = "/^\d+(\.\d+)*$/";
