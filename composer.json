@@ -2,6 +2,7 @@
   "name": "gzhegow/lib",
   "type": "library",
   "license": "MIT",
+  "version": "1.2.0",
 
   "authors": [
     {
@@ -45,7 +46,6 @@
     "ext-hash": "*",
     "ext-json": "*",
     "ext-pcre": "*",
-    "ext-session": "*",
     "ext-spl": "*"
   },
   "suggest": {
@@ -59,6 +59,7 @@
     "ext-pdo": "*",
     "ext-redis": "*",
     "ext-simplexml": "*",
+    "ext-session": "*",
     "ext-sockets": "*",
 
     "doctrine/inflector": "^2.0",
@@ -79,9 +80,5 @@
     "optimize-autoloader": true,
 
     "sort-packages": false
-  },
-
-  "extra": {
-    "version": "v1.2.0"
   }
 }

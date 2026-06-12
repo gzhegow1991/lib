@@ -570,34 +570,25 @@ class RandomModule
      *
      * @param string $refValue
      */
-    public function id_increment($value, &$refValue = null) : string
+    public function id_increment($value, ?int $delta = null, &$refValue = null) : string
     {
         $value = $value ?? 0;
+        $delta = $delta ?? 1;
 
-        $val = $value;
+        if ( $delta < 1 ) $delta = 1;
 
-        if ( is_int($val) ) {
-            if ( $val === PHP_INT_MAX ) {
-                Lib::bcmath();
-
-                $valString = bcadd($val, 1);
-
-            } else {
-                $val++;
-
-                $valString = (string) $val;
-            }
-
-        } elseif ( is_numeric($val) ) {
-            Lib::bcmath();
-
-            $valString = bcadd($val, 1);
-
-        } else {
+        if ( ! (false
+            || is_int($value)
+            || is_numeric($value)
+        ) ) {
             throw new LogicException(
                 [ 'The `value` should be int or numeric', $value ]
             );
         }
+
+        Lib::bcmath();
+
+        $valString = bcadd($value, $delta);
 
         $refValue = $valString;
 
@@ -609,34 +600,25 @@ class RandomModule
      *
      * @param string $refValue
      */
-    public function id_decrement($value, &$refValue = null) : string
+    public function id_decrement($value, ?int $delta = null, &$refValue = null) : string
     {
         $value = $value ?? 0;
+        $delta = $delta ?? 1;
 
-        $val = $value;
+        if ( $delta < 1 ) $delta = 1;
 
-        if ( is_int($val) ) {
-            if ( $val === PHP_INT_MIN ) {
-                Lib::bcmath();
-
-                $valString = bcsub($val, 1);
-
-            } else {
-                $val--;
-
-                $valString = (string) $val;
-            }
-
-        } elseif ( is_numeric($val) ) {
-            Lib::bcmath();
-
-            $valString = bcsub($val, 1);
-
-        } else {
+        if ( ! (false
+            || is_int($value)
+            || is_numeric($value)
+        ) ) {
             throw new LogicException(
                 [ 'The `value` should be int or numeric', $value ]
             );
         }
+
+        Lib::bcmath();
+
+        $valString = bcsub($value, $delta);
 
         $refValue = $valString;
 

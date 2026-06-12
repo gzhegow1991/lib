@@ -2633,6 +2633,15 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
+	public function version($value, int $segments = null)
+	{
+		return Lib::php()->type_version(null, $value, $segments);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
 	public function regex($value)
 	{
 		return Lib::preg()->type_regex(null, $value);

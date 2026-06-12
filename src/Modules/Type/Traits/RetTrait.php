@@ -2640,6 +2640,15 @@ trait RetTrait
 	/**
 	 * @return Ret<string>|string
 	 */
+	public function version($fb, $value, int $segments = null)
+	{
+		return Lib::php()->type_version($fb, $value, $segments);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
 	public function regex($fb, $value)
 	{
 		return Lib::preg()->type_regex($fb, $value);

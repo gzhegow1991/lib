@@ -1856,6 +1856,12 @@ trait BoolTrait
 	}
 
 
+	public function version($value, int $segments = null): bool
+	{
+		return Lib::php()->type_version(null, $value, $segments)->isOk();
+	}
+
+
 	public function regex($value): bool
 	{
 		return Lib::preg()->type_regex(null, $value)->isOk();

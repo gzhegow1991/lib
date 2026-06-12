@@ -8,7 +8,6 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class DateModule
@@ -2177,6 +2176,24 @@ class DateModule
         $bObject = $this->type_timezone([], $b);
 
         return $aObject->getName() === $bObject->getName();
+    }
+
+    /**
+     * @param string|\DateTimeInterface|\DateTimeZone $a
+     * @param string|\DateTimeInterface|\DateTimeZone $b
+     */
+    public function timezones_compare($a, $b, $date = null) : int
+    {
+        $date = $date ?? $this->the_adate_nil();
+
+        $aObject = $this->type_timezone([], $a);
+        $bObject = $this->type_timezone([], $b);
+        $dateObject = $this->type_adate([], $date);
+
+        $offset1 = $aObject->getOffset($dateObject);
+        $offset2 = $bObject->getOffset($dateObject);
+
+        return $offset1 <=> $offset2;
     }
 
 

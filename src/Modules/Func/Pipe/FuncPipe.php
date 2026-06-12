@@ -2,7 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Func\Pipe;
 
-use Gzhegow\Lib\Exception\Runtime\PipeException;
+use Gzhegow\Lib\Exception\Runtime\PipelineException;
 
 
 class FuncPipe
@@ -376,7 +376,7 @@ class FuncPipe
             return null;
         }
 
-        throw new PipeException(
+        throw new PipelineException(
             [ 'Unhandled exception during processing pipeline', $this->exception ],
             $this->exception
         );

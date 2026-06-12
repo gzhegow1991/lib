@@ -2397,6 +2397,38 @@ class PhpModule
 
 
     /**
+     * @return Ret<string>|string
+     */
+    public function type_version($fb, $value, ?int $segments = null)
+    {
+        $theType = Lib::type();
+
+        $valueString = $theType->string_not_empty($value)->orThrow();
+
+        if ( null === $segments ) {
+            $pattern = "/^\d+(\.\d+)*$/";
+
+        } else {
+            $segmentsInt = $theType->int_positive($segments)->orThrow();
+
+            $segmentsIntMinus1 = $segmentsInt - 1;
+
+            $pattern = "/^\d+(\.\d+){{$segmentsIntMinus1}}$/";
+        }
+
+        if ( ! preg_match($pattern, $valueString) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be valid version', $segments, $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+
+    /**
      * @return resource
      */
     public function phpin()
@@ -3025,24 +3057,25 @@ class PhpModule
     public function get_object_vars(object $object, $newScope = 'static') : array
     {
         if ( 'static' === $newScope ) {
-            // > if you need `static` scope you may call the existing php function
+            // > if you need `static` scope you may call the existing php function `get_object_vars`
+
             throw new RuntimeException(
-                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+                [ 'You should pass constant __CLASS__ to second argument to keep scope `static`' ]
             );
         }
 
-        $fnGetObjectVars = null;
-        if ( null !== $newScope ) {
-            $fnGetObjectVars = (static function ($object) {
+        if ( null === $newScope ) {
+            $getObjectVars = get_object_vars($object);
+
+        } else {
+            $fn = (static function ($object) {
                 return get_object_vars($object);
             })->bindTo(null, $newScope);
+
+            $getObjectVars = $fn($object);
         }
 
-        $vars = $fnGetObjectVars
-            ? $fnGetObjectVars($object)
-            : get_object_vars($object);
-
-        return $vars;
+        return $getObjectVars;
     }
 
     /**
@@ -3054,28 +3087,27 @@ class PhpModule
     public function get_class_vars($object_or_class, $newScope = 'static') : array
     {
         if ( 'static' === $newScope ) {
-            // > if you need `static` scope you may call the existing php function
+            // > if you need `static` scope you may call the existing php function `get_class_vars`
+
             throw new RuntimeException(
-                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+                [ 'You should pass constant __CLASS__ to second argument to keep scope `static`' ]
             );
         }
 
-        $fnGetClassVars = null;
-        if ( null !== $newScope ) {
-            $fnGetClassVars = (static function ($class) {
+        $className = is_object($object_or_class) ? get_class($object_or_class) : $object_or_class;
+
+        if ( null === $newScope ) {
+            $getClassVars = get_class_vars($className);
+
+        } else {
+            $fn = (static function ($class) {
                 return get_class_vars($class);
             })->bindTo(null, $newScope);
+
+            $getClassVars = $fn($className);
         }
 
-        $class = is_object($object_or_class)
-            ? get_class($object_or_class)
-            : $object_or_class;
-
-        $vars = $fnGetClassVars
-            ? $fnGetClassVars($class)
-            : get_class_vars($class);
-
-        return $vars;
+        return $getClassVars;
     }
 
     /**
@@ -3087,24 +3119,25 @@ class PhpModule
     public function get_class_methods($object_or_class, $newScope = 'static') : array
     {
         if ( 'static' === $newScope ) {
-            // > if you need `static` scope you may call the existing php function
+            // > if you need `static` scope you may call the existing php function `get_class_methods`
+
             throw new RuntimeException(
-                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+                [ 'You should pass constant __CLASS__ to second argument to keep scope `static`' ]
             );
         }
 
-        $fnGetClassMethods = null;
-        if ( null !== $newScope ) {
-            $fnGetClassMethods = (static function ($object_or_class) {
+        if ( null === $newScope ) {
+            $getClassMethods = get_class_methods($object_or_class);
+
+        } else {
+            $fn = (static function ($object_or_class) {
                 return get_class_methods($object_or_class);
             })->bindTo(null, $newScope);
+
+            $getClassMethods = $fn($object_or_class);
         }
 
-        $vars = $fnGetClassMethods
-            ? $fnGetClassMethods($object_or_class)
-            : get_class_vars($object_or_class);
-
-        return $vars;
+        return $getClassMethods;
     }
 
 
@@ -3118,29 +3151,25 @@ class PhpModule
     public function is_callable($value, $newScope = 'static') : bool
     {
         if ( 'static' === $newScope ) {
-            // > if you need `static` scope you may call the existing php function
+            // > if you need `static` scope you may call the existing php function `is_callable`
+
             throw new RuntimeException(
-                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+                [ 'You should pass constant __CLASS__ to second argument to keep scope `static`' ]
             );
         }
 
-        $fnIsCallable = null;
+        if ( null === $newScope ) {
+            $isCallable = is_callable($value);
 
-        if ( null !== $newScope ) {
-            $fnIsCallable = (static function ($callable) {
+        } else {
+            $fn = (static function ($callable) {
                 return is_callable($callable);
             })->bindTo(null, $newScope);
+
+            $isCallable = $fn($value);
         }
 
-        $status = $fnIsCallable
-            ? $fnIsCallable($value)
-            : is_callable($value);
-
-        if ( $status ) {
-            return true;
-        }
-
-        return false;
+        return (bool) $isCallable;
     }
 
 
@@ -3850,5 +3879,123 @@ class PhpModule
         $result['__unresolved'] = $__unresolved;
 
         return $result;
+    }
+
+
+    public function version_compare($a, $b) : int
+    {
+        $theType = Lib::type();
+
+        $aVersion = $theType->version($a)->orThrow();
+        $bVersion = $theType->version($b)->orThrow();
+
+        $arr1 = explode('.', $aVersion);
+        $arr2 = explode('.', $bVersion);
+
+        $maxLen = max(count($arr1), count($arr2));
+        $arr1 = array_pad($arr1, $maxLen, 0);
+        $arr2 = array_pad($arr2, $maxLen, 0);
+
+        for ( $i = 0; $i < $maxLen; $i++ ) {
+            $num1 = (int) $arr1[$i];
+            $num2 = (int) $arr2[$i];
+
+            if ( $num1 > $num2 ) return 1;
+            if ( $num1 < $num2 ) return -1;
+        }
+
+        return 0;
+    }
+
+    public function version_increment(string $version, string $increment) : string
+    {
+        $pattern = '/^\d+(\.\d+)*$/';
+
+        if ( ! preg_match($pattern, $version) ) {
+            throw new LogicException(
+                [ 'The `version` is invalid', $version, $pattern ]
+            );
+        }
+
+        if ( ! preg_match($pattern, $increment) ) {
+            throw new LogicException(
+                [ 'The `increment` is invalid', $increment, $pattern ]
+            );
+        }
+
+        $vArr = explode('.', $version);
+        $iArr = explode('.', $increment);
+
+        $maxSegments = max(count($vArr), count($iArr));
+        $vArr = array_pad($vArr, $maxSegments, 0);
+        $iArr = array_pad($iArr, $maxSegments, 0);
+
+        $result = [];
+
+        $triggerReset = false;
+
+        for ( $i = 0; $i < $maxSegments; $i++ ) {
+            $vNum = (int) $vArr[$i];
+            $iNum = (int) $iArr[$i];
+
+            if ( $triggerReset ) {
+                $result[$i] = 0 + $iNum;
+
+            } else {
+                $result[$i] = $vNum + $iNum;
+
+                if ( $iNum > 0 ) {
+                    $triggerReset = true;
+                }
+            }
+        }
+
+        return implode('.', $result);
+    }
+
+    public function version_decrement(string $version, string $decrement) : string
+    {
+        $pattern = '/^\d+(\.\d+)*$/';
+
+        if ( ! preg_match($pattern, $version) ) {
+            throw new LogicException(
+                [ 'The `version` is invalid', $version, $pattern ]
+            );
+        }
+
+        if ( ! preg_match($pattern, $decrement) ) {
+            throw new LogicException(
+                [ 'The `increment` is invalid', $decrement, $pattern ]
+            );
+        }
+
+        $vArr = explode('.', $version);
+        $iArr = explode('.', $decrement);
+
+        $maxSegments = max(count($vArr), count($iArr));
+        $vArr = array_pad($vArr, $maxSegments, 0);
+        $iArr = array_pad($iArr, $maxSegments, 0);
+
+        $result = [];
+
+        $triggerReset = false;
+
+        for ( $i = 0; $i < $maxSegments; $i++ ) {
+            $vNum = (int) $vArr[$i];
+            $iNum = (int) $iArr[$i];
+
+            if ( $triggerReset ) {
+                $result[$i] = max(0, 0 - $iNum);
+
+            } else {
+                $result[$i] = max(0, $vNum - $iNum);
+
+                if ( $iNum > 0 ) {
+                    $triggerReset = true;
+                }
+            }
+        }
+
+        return implode('.', $result);
     }
 }
