@@ -139,8 +139,8 @@ class DebugModule
                     + $varExportOptionsDefault
                     + [
                         static::VAR_EXPORT_OPT_WITH_ADDCSLASHES => null,
-                        static::VAR_EXPORT_OPT_INDENT           => '',
-                        static::VAR_EXPORT_OPT_NEWLINE          => ' ',
+                        static::VAR_EXPORT_OPT_INDENT           => "  ",
+                        static::VAR_EXPORT_OPT_NEWLINE          => "\n",
                     ];
             }
         }
@@ -148,8 +148,8 @@ class DebugModule
         if ( null === $this->stateVarExportOptionsDefault ) {
             $this->stateVarExportOptionsDefault = [
                 static::VAR_EXPORT_OPT_WITH_ADDCSLASHES => null,
-                static::VAR_EXPORT_OPT_INDENT           => '',
-                static::VAR_EXPORT_OPT_NEWLINE          => ' ',
+                static::VAR_EXPORT_OPT_INDENT           => "  ",
+                static::VAR_EXPORT_OPT_NEWLINE          => "\n",
             ];
         }
 
