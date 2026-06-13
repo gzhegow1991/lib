@@ -1704,6 +1704,18 @@ class DebugModule
     }
 
 
+    public function print_var_export(array $value, ?array $options = null, ?array &$refContext = null) : string
+    {
+        $content = implode("\n", [
+            '###',
+            $this->var_export($value, $options),
+            '###',
+        ]);
+
+        return $content;
+    }
+
+
     public function print_table(array $table) : string
     {
         if ( [] === $table ) {
@@ -1925,6 +1937,13 @@ class DebugModule
     public function dump_type_id_array_multiline($value, $levelMax = null, $options = null, &$refContext = null) : void
     {
         echo $this->print_type_id_array_multiline($value, $levelMax, $options, $refContext);
+        echo "\n";
+    }
+
+
+    public function dump_var_export($value, $options = null) : void
+    {
+        echo $this->print_var_export($value, $options);
         echo "\n";
     }
 
