@@ -1704,11 +1704,11 @@ class DebugModule
     }
 
 
-    public function print_var_export(array $value, ?array $options = null, ?array &$refContext = null) : string
+    public function print_var_export($value, ?array $options = null, ?int $level = null) : string
     {
         $content = implode("\n", [
             '###',
-            $this->var_export($value, $options),
+            $this->var_export($value, $options, $level),
             '###',
         ]);
 
@@ -1941,9 +1941,9 @@ class DebugModule
     }
 
 
-    public function dump_var_export($value, $options = null) : void
+    public function dump_var_export($value, $options = null, $level = null) : void
     {
-        echo $this->print_var_export($value, $options);
+        echo $this->print_var_export($value, $options, $level);
         echo "\n";
     }
 
