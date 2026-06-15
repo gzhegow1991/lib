@@ -473,7 +473,7 @@ class DebugModule
                     $vvar = get_object_vars($var);
 
                     // > ! recursion
-                    $result = $this->var_export(
+                    $result = $this->_var_export(
                         $vvar,
                         $options, $level,
                     );
