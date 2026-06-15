@@ -305,7 +305,8 @@ class ArrModule
         $prev = '';
 
         foreach ( $value as $key => $v ) {
-            $cmp = call_user_func($fnSortKeysCmp, $prev, $key);
+            // > call_user_func($fnSortKeysCmp, $prev, $key);
+            $cmp = $fnSortKeysCmp($prev, $key);
 
             if ( ! is_int($cmp) ) {
                 throw new RuntimeException(
@@ -399,7 +400,8 @@ class ArrModule
             $prev = '';
 
             foreach ( array_reverse($child, true) as $key => $v ) {
-                $cmp = call_user_func($fnSortKeysCmp, $prev, $key);
+                // > call_user_func($fnSortKeysCmp, $prev, $key);
+                $cmp = $fnSortKeysCmp($prev, $key);
 
                 if ( ! is_int($cmp) ) {
                     throw new RuntimeException(
@@ -1406,7 +1408,8 @@ class ArrModule
                 );
             }
 
-            $cmp = call_user_func($fnSortKeysCmp, $prev, $key);
+            // > call_user_func($fnSortKeysCmp, $prev, $key);
+            $cmp = $fnSortKeysCmp($prev, $key);
 
             if ( ! is_int($cmp) ) {
                 throw new RuntimeException(
@@ -1508,7 +1511,8 @@ class ArrModule
                     );
                 }
 
-                $cmp = call_user_func($fnSortKeysCmp, $prev, $key);
+                // > call_user_func($fnSortKeysCmp, $prev, $key);
+                $cmp = $fnSortKeysCmp($prev, $key);;
 
                 if ( ! is_int($cmp) ) {
                     throw new RuntimeException(

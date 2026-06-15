@@ -20,10 +20,10 @@ interface FuncInvokerInterface
     /**
      * @param callable|GenericCallable $fn
      */
-    public function callUserFunc($fn, ...$args);
+    public function callUserFunc($fn, ...$fnArgs);
 
     /**
      * @param callable|GenericCallable $fn
      */
-    public function callUserFuncArray($fn, array $args = []);
+    public function callUserFuncArray($fn, array $fnArgs = []);
 }

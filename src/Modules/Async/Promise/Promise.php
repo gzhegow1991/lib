@@ -570,7 +570,8 @@ class Promise
             $fnResolve = static::fnResolve($this);
             $fnReject = static::fnReject($this);
 
-            $result = call_user_func($fn, $fnResolve, $fnReject);
+            // > $result = call_user_func($fn, $fnResolve, $fnReject);
+            $result = $fn($fnResolve, $fnReject);
         }
         catch ( \Throwable $throwable ) {
         }
@@ -622,7 +623,8 @@ class Promise
             $throwable = null;
 
             try {
-                $result = call_user_func($fnOnResolved, $value);
+                // > $result = call_user_func($fnOnResolved, $value);
+                $result = $fnOnResolved($value);
             }
             catch ( \Throwable $throwable ) {
             }
@@ -689,7 +691,8 @@ class Promise
             $throwable = null;
 
             try {
-                $result = call_user_func($fnOnRejected, $reason);
+                // > $result = call_user_func($fnOnRejected, $reason);
+                $result = $fnOnRejected($reason);
             }
             catch ( \Throwable $throwable ) {
             }
@@ -751,7 +754,8 @@ class Promise
                 $throwable = null;
 
                 try {
-                    $result = call_user_func($fnOnFinally);
+                    // > $result = call_user_func($fnOnFinally);
+                    $result = $fnOnFinally();
                 }
                 catch ( \Throwable $throwable ) {
                 }

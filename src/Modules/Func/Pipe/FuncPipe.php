@@ -395,10 +395,11 @@ class FuncPipe
     /**
      * @return mixed
      */
-    protected function callUserFuncArray($fn, array $args = [])
+    protected function callUserFuncArray($fn, array $fnArgs = [])
     {
-        return call_user_func_array($fn, $args);
+        return call_user_func_array($fn, $fnArgs);
     }
+
 
     protected function makeArgsCallUserFuncArray(
         array $inputArgs,

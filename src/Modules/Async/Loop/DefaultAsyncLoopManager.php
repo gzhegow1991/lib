@@ -211,7 +211,8 @@ class DefaultAsyncLoopManager implements AsyncLoopManagerInterface
             while ( ! $queue->isEmpty() ) {
                 $fn = $queue->dequeue();
 
-                call_user_func($fn);
+                // > call_user_func($fn)
+                $fn();
 
                 unset($fn);
             }
@@ -222,7 +223,8 @@ class DefaultAsyncLoopManager implements AsyncLoopManagerInterface
             while ( ! $queue->isEmpty() ) {
                 $fn = $queue->dequeue();
 
-                call_user_func($fn);
+                // > call_user_func($fn)
+                $fn();
 
                 unset($fn);
             }
@@ -233,7 +235,8 @@ class DefaultAsyncLoopManager implements AsyncLoopManagerInterface
             while ( ! $queue->isEmpty() ) {
                 $fn = $queue->dequeue();
 
-                call_user_func($fn, $now);
+                // > call_user_func($fn, $now)
+                $fn($now);
 
                 unset($fn);
             }

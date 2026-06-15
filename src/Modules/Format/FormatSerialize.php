@@ -13,13 +13,10 @@ class FormatSerialize
      */
     public function serialize($fb, $data)
     {
-        $theFunc = Lib::func();
+        $fnSerialize = Lib::fn('serialize')->setSafe()->make();
 
         try {
-            $result = $theFunc->safe_call(
-                'serialize',
-                [ $data ]
-            );
+            $result = $fnSerialize($data);
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
@@ -45,7 +42,6 @@ class FormatSerialize
      */
     public function unserialize($fb, $serialized)
     {
-        $theFunc = Lib::func();
         $theType = Lib::type();
 
         $ret = $theType->string_not_empty($serialized);
@@ -58,11 +54,10 @@ class FormatSerialize
             );
         }
 
+        $fnUnserialize = Lib::fn('unserialize')->setSafe()->make();
+
         try {
-            $result = $theFunc->safe_call(
-                'unserialize',
-                [ $serializedString ]
-            );
+            $result = $fnUnserialize($serializedString);
         }
         catch ( \Throwable $e ) {
             return Ret::throw(

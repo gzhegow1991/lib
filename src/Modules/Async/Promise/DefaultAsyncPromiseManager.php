@@ -272,7 +272,7 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
         ) {
             $nowMicrotime = $ctx->updateNowMicrotime();
 
-            // > call_user_func_array($fnPooling, [ $ctx ]);
+            // > call_user_func($fnPooling, $ctx);
             $fnPooling($ctx);
 
             if ( $ctx->hasResult($refResult) ) {
@@ -335,7 +335,8 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
             if ( ! $isSettled ) {
                 $isSettled = true;
 
-                call_user_func($fnResolveParent, $value);
+                // > call_user_func_array($fnResolveParent, $value);
+                $fnResolveParent($value);
             }
         };
 
@@ -347,7 +348,8 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
             if ( ! $isSettled ) {
                 $isSettled = true;
 
-                call_user_func($fnRejectParent, $reason);
+                // > call_user_func_array($fnRejectParent, $reason);
+                $fnRejectParent($reason);
             }
         };
 
@@ -403,7 +405,8 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
                 $psLeft--;
 
                 if ( ! $isSettled ) {
-                    call_user_func($fnResolveParent, $value);
+                    // > call_user_func($fnResolveParent, $value);
+                    $fnResolveParent($value);
 
                     $report = false;
 
@@ -434,7 +437,8 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
                     $isLast = ($psLeft === 0);
 
                     if ( $isLast ) {
-                        call_user_func($fnRejectParent, $report);
+                        // > call_user_func($fnRejectParent, $report);
+                        $fnRejectParent($report);
 
                         $isSettled = true;
                     }
@@ -495,7 +499,8 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
                 if ( ! $isSettled ) {
                     $isLast = ($psLeft === 0);
                     if ( $isLast ) {
-                        call_user_func($fnResolveParent, $report);
+                        // > call_user_func($fnResolveParent, $report);
+                        $fnResolveParent($report);
                     }
                 }
             };
@@ -518,7 +523,8 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
                 if ( ! $isSettled ) {
                     $isLast = ($psLeft === 0);
                     if ( $isLast ) {
-                        call_user_func($fnResolveParent, $report);
+                        // > call_user_func($fnResolveParent, $report);
+                        $fnResolveParent($report);
                     }
                 }
             };
@@ -587,7 +593,8 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
                     $isLast = ($psLeft === 0);
 
                     if ( $isLast ) {
-                        call_user_func($fnResolveParent, $results);
+                        // > call_user_func($fnResolveParent, $results);
+                        $fnResolveParent($results);
 
                         $report = false;
 
@@ -620,10 +627,12 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
                     $isLast = ($psLeft === 0);
 
                     if ( $isLast ) {
-                        call_user_func($fnRejectParent, $report);
+                        // > call_user_func($fnRejectParent, $report);
+                        $fnRejectParent($report);
 
                     } else {
-                        call_user_func($fnRejectParent, $reason);
+                        // > call_user_func($fnRejectParent, $reason);
+                        $fnRejectParent($reason);
 
                         $report = false;
                     }
@@ -678,7 +687,8 @@ class DefaultAsyncPromiseManager implements AsyncPromiseManagerInterface
                     }
                 }
 
-                call_user_func($fnRejectTimeout, $reasonThrowable);
+                // > call_user_func($fnRejectTimeout, $reasonThrowable);
+                $fnRejectTimeout($reasonThrowable);
             }
         );
 

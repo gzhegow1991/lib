@@ -567,7 +567,8 @@ class MemcachedAdapter
         $fn = $this->fnEnsureOptionsUser;
 
         if ( null !== $fn ) {
-            call_user_func($fn, $memcached, $configValid, $this);
+            // > call_user_func($fn, $memcached, $configValid, $this)
+            $fn($memcached, $configValid, $this);
         }
     }
 

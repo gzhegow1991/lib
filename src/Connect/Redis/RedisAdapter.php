@@ -594,7 +594,8 @@ class RedisAdapter
         $fn = $this->fnEnsureOptionsUser;
 
         if ( null !== $fn ) {
-            call_user_func($fn, $redis, $configValid, $this);
+            // > call_user_func($fn, $redis, $configValid, $this);
+            $fn($redis, $configValid, $this);
         }
     }
 
@@ -621,13 +622,12 @@ class RedisAdapter
             );
         }
 
+        $fnRedisConnect = Lib::fn([ $redis, 'connect' ])->setSafe()->make();
+
         $error = 'Status is false';
         $exception = null;
         try {
-            $status = $theFunc->safe_call(
-                [ $redis, 'connect' ],
-                $connectArgs
-            );
+            $status = $fnRedisConnect(...$connectArgs);
         }
         catch ( \Throwable $e ) {
             $status = false;
@@ -661,13 +661,12 @@ class RedisAdapter
             return;
         }
 
+        $fnRedisAuth = Lib::fn([ $redis, 'auth' ])->setSafe()->make();
+
         $error = 'Status is false';
         $exception = null;
         try {
-            $status = $theFunc->safe_call(
-                [ $redis, 'auth' ],
-                $authArgs
-            );
+            $status = $fnRedisAuth(...$authArgs);
         }
         catch ( \Throwable $e ) {
             $status = false;
@@ -686,17 +685,14 @@ class RedisAdapter
 
     protected function redisSafeSelectDatabase(\Redis $redis, array $configValid) : void
     {
-        $theFunc = Lib::func();
-
         $database = $configValid['database'];
+
+        $fnRedisSelect = Lib::fn([ $redis, 'select' ])->setSafe()->make();
 
         $error = 'Status is false';
         $exception = null;
         try {
-            $status = $theFunc->safe_call(
-                [ $redis, 'select' ],
-                [ $database ]
-            );
+            $status = $fnRedisSelect($database);
         }
         catch ( \Throwable $e ) {
             $status = false;

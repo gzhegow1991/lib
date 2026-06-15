@@ -45,11 +45,13 @@ use Gzhegow\Lib\Modules\Format\FormatHtml;
 use Gzhegow\Lib\Modules\Func\Pipe\FuncPipe;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Format\FormatBaseN;
+use Gzhegow\Lib\Modules\Func\Callback\FuncFn;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 use Gzhegow\Lib\Modules\Test\TestCase\TestCase;
 use Gzhegow\Lib\Modules\Format\FormatSerialize;
 use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafeProxy;
 use Gzhegow\Lib\Modules\Php\Microtimer\Microtimer;
+use Gzhegow\Lib\Modules\Func\Callback\FuncCallback;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
 use Gzhegow\Lib\Modules\Fs\SocketSafe\SocketSafeProxy;
 use Gzhegow\Lib\Modules\Fs\StreamSafe\StreamSafeProxy;
@@ -59,7 +61,6 @@ use Gzhegow\Lib\Modules\Debug\Dumper\DebugDumperInterface;
 use Gzhegow\Lib\Modules\Func\Invoker\FuncInvokerInterface;
 use Gzhegow\Lib\Modules\Php\Process\ProcessManagerInterface;
 use Gzhegow\Lib\Modules\Async\Loop\AsyncLoopManagerInterface;
-use Gzhegow\Lib\Modules\Test\TestDumper\TestPrinterInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\AsyncFetchApiInterface;
 use Gzhegow\Lib\Modules\Async\Clock\AsyncClockManagerInterface;
 use Gzhegow\Lib\Modules\Str\Interpolator\InterpolatorInterface;
@@ -1020,42 +1021,18 @@ class Lib
     }
 
 
-    public static function dumper($dumper = null, $printer = null) : DebugDumperInterface
+    /**
+     * > фабрика для Fn - позволяет выполнить встроенные пхп функции дополняя их аргументами или превратив результат в bool, удобно для array_map
+     *
+     * @param callable                 $fn
+     * @param object|null              $newThis
+     * @param object|class-string|null $newScope
+     *
+     * @return FuncCallback
+     */
+    public static function fn($fn, $newThis = null, $newScope = null)
     {
-        $theDebugDumper = Lib::debugDumper(false);
-
-        if ( null !== $dumper ) {
-            $dumperArray = (array) $dumper;
-
-            $theDebugDumper->selectDumper(...$dumperArray);
-        }
-
-        if ( null !== $printer ) {
-            $printerArray = (array) $printer;
-
-            $theDebugDumper->selectPrinter(...$printerArray);
-        }
-
-        return $theDebugDumper;
-    }
-
-    public static function newDumper($dumper = null, $printer = null) : DebugDumperInterface
-    {
-        $theDebugDumper = Lib::debugDumper(true);
-
-        if ( null !== $dumper ) {
-            $dumperArray = (array) $dumper;
-
-            $theDebugDumper->selectDumper(...$dumperArray);
-        }
-
-        if ( null !== $printer ) {
-            $printerArray = (array) $printer;
-
-            $theDebugDumper->selectPrinter(...$printerArray);
-        }
-
-        return $theDebugDumper;
+        return Lib::func()->newCallback($fn, $newThis, $newScope);
     }
 
 

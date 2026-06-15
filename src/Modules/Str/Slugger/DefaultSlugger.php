@@ -279,7 +279,7 @@ class DefaultSlugger implements SluggerInterface
     public function getLocaleDefaultUser() : ?string
     {
         $localeDefaultUser = null
-            ?? (is_callable($this->localeDefault) ? call_user_func($this->localeDefault) : null)
+            ?? (is_callable($fn = $this->localeDefault) ? $fn() : null)
             ?? (is_string($this->localeDefault) ? $this->localeDefault : null)
             ?? null;
 

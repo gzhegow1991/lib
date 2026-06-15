@@ -303,9 +303,9 @@ class HttpModule
     {
         $result = [];
 
-        $headers_list = $headers_list ?? headers_list();
+        $headersList = $headers_list ?? headers_list();
 
-        foreach ( $headers_list as $header ) {
+        foreach ( $headersList as $header ) {
             $result[] = HttpHeader::fromString($header);
         }
 
@@ -314,15 +314,17 @@ class HttpModule
 
     public function headers_clear() : array
     {
-        $headers = headers_list();
+        $headersList = headers_list();
 
-        foreach ( $headers as $header ) {
+        $fnHeaderRemove = Lib::fn('header_remove')->setSafe()->make();
+
+        foreach ( $headersList as $header ) {
             [ $headerName ] = explode(':', $header, 2);
 
-            header_remove($headerName);
+            $fnHeaderRemove($headerName);
         }
 
-        return $headers;
+        return $headersList;
     }
 
 
@@ -334,13 +336,9 @@ class HttpModule
         $replace = $replace ?? true;
         $response_code = $response_code ?? 0;
 
-        $theFunc = Lib::func();
+        $fnHeader = Lib::fn('header')->setSafe()->make();
 
-        $theFunc->safe_call(
-            static function () use ($header, $replace, $response_code) {
-                header($header, $replace, $response_code);
-            }
-        );
+        $fnHeader($header, $replace, $response_code);
 
         return $this;
     }
@@ -350,13 +348,9 @@ class HttpModule
      */
     public function header_remove(?string $header)
     {
-        $theFunc = Lib::func();
+        $fnHeaderRemove = Lib::fn('header_remove')->setSafe()->make();
 
-        $theFunc->safe_call(
-            static function () use ($header) {
-                header_remove($header);
-            }
-        );
+        $fnHeaderRemove($header);
 
         return $this;
     }
@@ -379,15 +373,11 @@ class HttpModule
         $secure = $secure ?? false;
         $httponly = $httponly ?? false;
 
-        $theFunc = Lib::func();
+        $fnSetcookie = Lib::fn('setcookie')->setSafe()->make();
 
-        $theFunc->safe_call(
-            static function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
-                is_array($expires_or_options)
-                    ? setcookie($name, $value, $expires_or_options)
-                    : setcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
-            }
-        );
+        is_array($expires_or_options)
+            ? $fnSetcookie($name, $value, $expires_or_options)
+            : $fnSetcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
 
         return $this;
     }
@@ -409,15 +399,11 @@ class HttpModule
         $secure = $secure ?? false;
         $httponly = $httponly ?? false;
 
-        $theFunc = Lib::func();
+        $fnSetrawcookie = Lib::fn('setrawcookie')->setSafe()->make();
 
-        $theFunc->safe_call(
-            static function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
-                is_array($expires_or_options)
-                    ? setrawcookie($name, $value, $expires_or_options)
-                    : setrawcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
-            }
-        );
+        is_array($expires_or_options)
+            ? $fnSetrawcookie($name, $value, $expires_or_options)
+            : $fnSetrawcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
 
         return $this;
     }

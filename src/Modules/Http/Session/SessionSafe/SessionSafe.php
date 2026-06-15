@@ -80,17 +80,11 @@ class SessionSafe
     /**
      * @return mixed
      */
-    public function call_safe(\Closure $fn, array $args = [])
+    public function call_safe(\Closure $fn, array $fnArgs = [])
     {
-        $theFunc = Lib::func();
+        $fnSafe = Lib::fn($fn)->setSafe()->make();
 
-        $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
-        $beforeErrorHandler = set_error_handler([ $theFunc, 'safe_call_error_handler' ]);
-
-        $result = call_user_func_array($fn, $args);
-
-        set_error_handler($beforeErrorHandler);
-        error_reporting($beforeErrorReporting);
+        $result = call_user_func_array($fnSafe, $fnArgs);
 
         return $result;
     }

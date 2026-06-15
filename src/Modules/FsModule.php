@@ -985,22 +985,18 @@ class FsModule
         $hasFilters = (null !== $filters);
 
         if ( $withGetimagesize || $hasFilters ) {
-            $theFunc = Lib::func();
-
             $fileRealpath = $splFileInfo->getRealPath();
 
+            $fnGetimagesize = Lib::fn('getimagesize')->setSafe()->make();
+
             try {
-                $getimagesizeRes = $theFunc->safe_call(
-                    static function () use ($fileRealpath) {
-                        return getimagesize($fileRealpath);
-                    }
-                );
+                $resGetimagesize = $fnGetimagesize($fileRealpath);
             }
             catch ( \Throwable $e ) {
-                $getimagesizeRes = false;
+                $resGetimagesize = false;
             }
 
-            if ( false === $getimagesizeRes ) {
+            if ( false === $resGetimagesize ) {
                 return Ret::throw(
                     $fb,
                     [ 'The `value` should pass `getimagesize` call', $value, $filters ],
@@ -1008,7 +1004,7 @@ class FsModule
                 );
             }
 
-            $refGetimagesize = $getimagesizeRes;
+            $refGetimagesize = $resGetimagesize;
         }
 
         if ( $hasFilters ) {

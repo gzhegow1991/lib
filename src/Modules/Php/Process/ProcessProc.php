@@ -618,11 +618,10 @@ class ProcessProc
         $env = $this->env;
         $options = $this->options;
 
+        $fnProcOpen = Lib::fn('proc_open')->setSafe()->make();
+
         try {
-            $ph = $theFunc->safe_call(
-                'proc_open',
-                [ $oscmd, $spec, &$pipes, $cwd, $env, $options ],
-            );
+            $ph = $fnProcOpen($oscmd, $spec, $pipes, $cwd, $env, $options);
 
             $this->procOpenResource = $ph;
 
@@ -743,11 +742,10 @@ class ProcessProc
         $env = $this->env;
         $options = $this->options;
 
+        $fnProcOpen = Lib::fn('proc_open')->setSafe()->make();
+
         try {
-            $ph = $theFunc->safe_call(
-                'proc_open',
-                [ $oscmd, $spec, &$pipes, $cwd, $env, $options ],
-            );
+            $ph = $fnProcOpen($oscmd, $spec, $pipes, $cwd, $env, $options);
 
             $this->procOpenResource = $ph;
 
@@ -836,12 +834,9 @@ class ProcessProc
             return $this->symfonyProcess->isRunning();
 
         } elseif ( $this->procOpenResource ) {
-            $theFunc = Lib::func();
+            $fnProcGetStatus = Lib::fn('proc_get_status')->setSafe()->make();
 
-            $status = $theFunc->safe_call(
-                'proc_get_status',
-                [ $this->procOpenResource ],
-            );
+            $status = $fnProcGetStatus($this->procOpenResource);
 
             return $status['running'];
         }
@@ -901,15 +896,13 @@ class ProcessProc
         } else {
             $ph = $this->procOpenResource;
 
+            $fnProcGetStatus = Lib::fn('proc_get_status')->setSafe()->make();
+
             $fnTick = function ($ctx) use (
-                $theFunc,
                 $ph,
-                $fnWait
+                $fnWait, $fnProcGetStatus
             ) {
-                $status = $theFunc->safe_call(
-                    'proc_get_status',
-                    [ $ph ],
-                );
+                $status = $fnProcGetStatus($ph);
 
                 if ( $this->stdoutRefFile && is_file($this->stdoutRefFile) ) {
                     $h = fopen($this->stdoutRefFile, 'rb');
@@ -1028,16 +1021,13 @@ class ProcessProc
         } else {
             $ph = $this->procOpenResource;
 
-            $fnTick = function ($fnResolve) use (
-                $theFunc,
-                $ph,
-                $fnWait
-            ) {
-                $status = $theFunc->safe_call(
-                    'proc_get_status',
-                    [ $ph ],
-                );
+            $fnProcGetStatus = Lib::fn('proc_get_status')->setSafe()->make();
 
+            $fnTick = function ($fnResolve) use (
+                $ph,
+                $fnWait, $fnProcGetStatus
+            ) {
+                $status = $fnProcGetStatus($ph);
 
                 if ( $this->stdoutRefFile && is_file($this->stdoutRefFile) ) {
                     $h = fopen($this->stdoutRefFile, 'rb');

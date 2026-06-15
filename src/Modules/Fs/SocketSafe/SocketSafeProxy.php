@@ -41,7 +41,7 @@ class SocketSafeProxy
     /**
      * @return mixed
      */
-    public function __call($name, $args)
+    public function __call($name, $arguments)
     {
         /**
          * @var array<string, callable> $map
@@ -66,8 +66,6 @@ class SocketSafeProxy
             );
         }
 
-        $theFunc = Lib::func();
-
         $fn = $map[$name];
 
         if ( is_array($fn) ) {
@@ -76,7 +74,9 @@ class SocketSafeProxy
             }
         }
 
-        $result = $theFunc->safe_call($fn, $args);
+        $fnSafe = Lib::fn($fn)->setSafe()->make();
+
+        $result = call_user_func_array($fnSafe, $arguments);
 
         return $result;
     }

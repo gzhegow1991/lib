@@ -28,7 +28,6 @@ class PregModule
      */
     public function type_regex($fb, $value)
     {
-        $theFunc = Lib::func();
         $theType = Lib::type();
 
         $ret = $theType->string_not_empty($value);
@@ -43,11 +42,10 @@ class PregModule
 
         $regex = $valueStringNotEmpty;
 
+        $fnPregMatch = Lib::fn('preg_match')->setSafe()->make();
+
         try {
-            $isMatch = $theFunc->safe_call(
-                'preg_match',
-                [ $regex, '' ]
-            );
+            $isMatch = $fnPregMatch($regex, '');
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
@@ -86,11 +84,10 @@ class PregModule
             );
         }
 
+        $fnPregMatch = Lib::fn('preg_match')->setSafe()->make();
+
         try {
-            $isMatch = $theFunc->safe_call(
-                'preg_match',
-                [ "{$enclosure}{$valueStringNotEmpty}{$enclosure}{$flags}", '' ]
-            );
+            $isMatch = $fnPregMatch("{$enclosure}{$valueStringNotEmpty}{$enclosure}{$flags}", '');
         }
         catch ( \Throwable $e ) {
             return Ret::throw(

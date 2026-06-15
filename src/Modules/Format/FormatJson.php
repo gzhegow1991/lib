@@ -4,8 +4,6 @@ namespace Gzhegow\Lib\Modules\Format;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
-use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class FormatJson
@@ -131,16 +129,14 @@ class FormatJson
         $depth = $depth ?? $this->stateJsonDepth();
         $flags = $flags ?? $this->stateJsonDecodeFlags();
 
-        $theFunc = Lib::func();
         $theType = Lib::type();
 
         $jsonStringNotEmpty = $theType->string_not_empty($json)->orThrow();
 
+        $fnJsonDecode = Lib::fn('json_decode')->setSafe()->make();
+
         try {
-            $result = $theFunc->safe_call(
-                'json_decode',
-                [ $jsonStringNotEmpty, $isAssociative, $depth, $flags ],
-            );
+            $result = $fnJsonDecode($jsonStringNotEmpty, $isAssociative, $depth, $flags);
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
@@ -207,11 +203,10 @@ class FormatJson
             $jsoncStringNotEmpty = preg_replace($regex, '', $jsoncStringNotEmpty);
         }
 
+        $fnJsonDecode = Lib::fn('json_decode')->setSafe()->make();
+
         try {
-            $result = $theFunc->safe_call(
-                'json_decode',
-                [ $jsoncStringNotEmpty, $isAssociative, $depth, $flags ],
-            );
+            $result = $fnJsonDecode($jsoncStringNotEmpty, $isAssociative, $depth, $flags);
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
@@ -273,11 +268,10 @@ class FormatJson
         $flags = $flags ?? $this->stateJsonEncodeFlags();
         $depth = $depth ?? $this->stateJsonDepth();
 
+        $fnJsonEncode = Lib::fn('json_encode')->setSafe()->make();
+
         try {
-            $result = $theFunc->safe_call(
-                'json_encode',
-                [ $value, $flags, $depth ],
-            );
+            $result = $fnJsonEncode($value, $flags, $depth);
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
@@ -336,11 +330,10 @@ class FormatJson
 
         $depth = $depth ?? $this->stateJsonDepth();
 
+        $fnJsonEncode = Lib::fn('json_encode')->setSafe()->make();
+
         try {
-            $result = $theFunc->safe_call(
-                'json_encode',
-                [ $value, $flags, $depth ],
-            );
+            $result = $fnJsonEncode($value, $flags, $depth);
         }
         catch ( \Throwable $e ) {
             return Ret::throw(

@@ -7,18 +7,18 @@ define('__DIR_ROOT__', __DIR__ . '/../..');
 \Gzhegow\Lib\Lib::entrypoint()
     ->setAllRecommended()
     //
-    ->setPhpDisplayStartupErrors(0)
-    ->setPhpDisplayErrors(0)
-    ->setPhpLogErrors(1)
-    ->setPhpErrorLog(__DIR_ROOT__ . '/var/log/php_error.log')
-    //
-    ->setPhpMaxExecutionTime(0)
+    // // > debug
+    // ->setPhpDisplayStartupErrors(0)
+    // ->setPhpDisplayErrors(0)
+    // ->setPhpLogErrors(1)
+    // ->setPhpErrorLog(__DIR_ROOT__ . '/var/log/php_error.log')
+    // // < debug
     //
     ->setCustomDirRoot(__DIR_ROOT__)
     //
-    ->useAll()
+    ->setPhpMaxExecutionTime(0)
     //
-    ->lock()
+    ->useAll()
 ;
 
 $theCli = \Gzhegow\Lib\Lib::cli();

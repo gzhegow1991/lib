@@ -357,7 +357,6 @@ class DebugModule
     public function var_export($var, ?array $options = null, ?int $level = null)
     {
         $options = $options ?? [];
-        $level = $level ?? 0;
 
         $options = $this->_var_export_options(
             null,
@@ -365,6 +364,16 @@ class DebugModule
             null
         );
 
+        $content = $this->_var_export($var, $options);
+
+        return $content;
+    }
+
+    /**
+     * @return string|float|int|null
+     */
+    protected function _var_export($var, array $options = [], int $level = 0)
+    {
         $optWithAddcslashes = $options[static::VAR_EXPORT_OPT_WITH_ADDCSLASHES];
         $optIndent = $options[static::VAR_EXPORT_OPT_INDENT];
         $optNewline = $options[static::VAR_EXPORT_OPT_NEWLINE];
@@ -432,7 +441,7 @@ class DebugModule
 
                         } else {
                             // > ! recursion
-                            $vvarString = $this->var_export(
+                            $vvarString = $this->_var_export(
                                 $vvar,
                                 $options, $level + 1
                             );
@@ -1704,11 +1713,11 @@ class DebugModule
     }
 
 
-    public function print_var_export($value, ?array $options = null, ?int $level = null) : string
+    public function print_var_export($value, ?array $options = null) : string
     {
         $content = implode("\n", [
             '###',
-            $this->var_export($value, $options, $level),
+            $this->var_export($value, $options),
             '###',
         ]);
 
@@ -1778,7 +1787,8 @@ class DebugModule
             echo "\n";
         };
 
-        call_user_func($fnDrawLine);
+        // > call_user_func($fnDrawLine)
+        $fnDrawLine();
 
         echo '| ';
         echo str_pad('', $thWidth);
@@ -1792,7 +1802,8 @@ class DebugModule
 
         echo "\n";
 
-        call_user_func($fnDrawLine);
+        // > call_user_func($fnDrawLine)
+        $fnDrawLine();
 
         foreach ( $table as $rowKey => $row ) {
             echo '| ';
@@ -1811,7 +1822,8 @@ class DebugModule
             echo "\n";
         }
 
-        call_user_func($fnDrawLine);
+        // > call_user_func($fnDrawLine)
+        $fnDrawLine();
 
         $content = ob_get_clean();
 
@@ -1941,9 +1953,9 @@ class DebugModule
     }
 
 
-    public function dump_var_export($value, $options = null, $level = null) : void
+    public function dump_var_export($value, $options = null) : void
     {
-        echo $this->print_var_export($value, $options, $level);
+        echo $this->print_var_export($value, $options);
         echo "\n";
     }
 

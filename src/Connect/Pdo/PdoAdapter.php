@@ -873,7 +873,8 @@ class PdoAdapter
     {
         $fn = $this->fnSelectPdoRead;
 
-        $i = call_user_func($fn, $this->configReadList, $this);
+        // > $i = call_user_func($fn, $this->configReadList, $this);
+        $i = $fn($this->configReadList, $this);
 
         return $i;
     }
@@ -898,7 +899,8 @@ class PdoAdapter
     {
         $fn = $this->fnSelectPdoWrite;
 
-        $i = call_user_func($fn, $this->configWriteList, $this);
+        // > $i = call_user_func($fn, $this->configWriteList, $this);
+        $i = $fn($this->configWriteList, $this);
 
         return $i;
     }
@@ -1007,7 +1009,8 @@ class PdoAdapter
         $fn = $this->fnEnsureOptionsUser;
 
         if ( null !== $fn ) {
-            call_user_func($fn, $pdo, $configValid, $this);
+            // > call_user_func($fn, $pdo, $configValid, $this);
+            $fn($pdo, $configValid, $this);
         }
     }
 
@@ -1077,7 +1080,8 @@ class PdoAdapter
         $fn = $this->fnSqlEnsureCharsetUser;
 
         if ( null !== $fn ) {
-            $sql .= call_user_func($fn, $pdo, $configValid, $this);
+            // > $sql .= call_user_func($fn, $pdo, $configValid, $this);
+            $sql .= $fn($pdo, $configValid, $this);
         }
 
         return $sql;
@@ -1130,7 +1134,8 @@ class PdoAdapter
         $fn = $this->fnSqlEnsureDatabaseUser;
 
         if ( null !== $fn ) {
-            $sql .= call_user_func($fn, $pdo, $configValid, $this);
+            // > $sql .= call_user_func($fn, $pdo, $configValid, $this);
+            $sql .= $fn($pdo, $configValid, $this);
         }
 
         return $sql;
@@ -1183,7 +1188,8 @@ class PdoAdapter
         $fn = $this->fnSqlEnsureTimezoneUser;
 
         if ( null !== $fn ) {
-            $sql .= call_user_func($fn, $pdo, $configValid, $this);
+            // > $sql .= call_user_func($fn, $pdo, $configValid, $this);
+            $sql .= $fn($pdo, $configValid, $this);
         }
 
         return $sql;

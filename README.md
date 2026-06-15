@@ -26,9 +26,6 @@ define('__DIR_ROOT__', __DIR__ . '/..');
 \Gzhegow\Lib\Lib::entrypoint()
     ->setAllRecommended()
     //
-    ->setPhpLogErrors(1)
-    ->setPhpErrorLog(__DIR__ . '/../../var/log/php_error.log')
-    //
     ->setCustomDirRoot(__DIR__ . '/..')
     //
     ->useAll()
@@ -286,6 +283,7 @@ $test->run();
 // "https://yandex.ru/ - HTTP: 200"
 // ');
 // $test->run();
+// die();
 
 
 
@@ -4358,7 +4356,7 @@ $fn = function () use ($theDebug) {
 
     class PhpModuleDummy2
     {
-        public function __call($name, $args)
+        public function __call($name, $arguments)
         {
             echo __METHOD__ . "\n";
         }

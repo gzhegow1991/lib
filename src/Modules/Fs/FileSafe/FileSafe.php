@@ -2345,26 +2345,21 @@ class FileSafe
      */
     public function call_safe(\Closure $fn, array $args = [])
     {
-        $theFunc = Lib::func();
+        $fnSafe = Lib::fn($fn)->setSafe()->make();
 
-        $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
-        $beforeErrorHandler = set_error_handler([ $theFunc, 'safe_call_error_handler' ]);
-
-        $previousCtx = $this->setContext($currentCtx = new FileSafeContext());
+        $currentCtx = new FileSafeContext();
+        $previousCtx = $this->setContext($currentCtx);
 
         try {
             array_unshift($args, $currentCtx);
 
-            $result = call_user_func_array($fn, $args);
+            $result = call_user_func_array($fnSafe, $args);
         }
         finally {
             $currentCtx->handleOnFinally();
 
             $this->setContext($previousCtx);
         }
-
-        set_error_handler($beforeErrorHandler);
-        error_reporting($beforeErrorReporting);
 
         return $result;
     }

@@ -33,10 +33,10 @@ class DefaultFuncInvoker implements FuncInvokerInterface
     /**
      * @param callable|GenericCallable $fn
      */
-    public function callUserFunc($fn, ...$args)
+    public function callUserFunc($fn, ...$fnArgs)
     {
         if ( ! ($fn instanceof GenericCallable) ) {
-            $result = call_user_func_array($fn, $args);
+            $result = call_user_func_array($fn, $fnArgs);
 
         } else {
             if ( $fn->isClosure() ) {
@@ -44,7 +44,7 @@ class DefaultFuncInvoker implements FuncInvokerInterface
 
             } elseif ( $fn->isMethod() ) {
                 if ( $fn->hasMethodClass($className) ) {
-                    $cbObj = $this->newInvokeObject($fn->getMethodClass(), $args);
+                    $cbObj = $this->newInvokeObject($fn->getMethodClass(), $fnArgs);
 
                 } else {
                     $cbObj = $fn->getMethodObject();
@@ -54,7 +54,7 @@ class DefaultFuncInvoker implements FuncInvokerInterface
 
             } elseif ( $fn->isInvokable() ) {
                 if ( $fn->hasInvokableClass($className) ) {
-                    $cb = $this->newInvokeObject($className, $args);
+                    $cb = $this->newInvokeObject($className, $fnArgs);
 
                 } else {
                     $cb = $fn->getInvokableObject();
@@ -62,11 +62,7 @@ class DefaultFuncInvoker implements FuncInvokerInterface
 
             } elseif ( $fn->isFunction() ) {
                 if ( $fn->hasFunctionStringInternal($fnStringInternal) ) {
-                    $cb = static function (...$args) use ($fnStringInternal) {
-                        $theFunc = Lib::func();
-
-                        return $theFunc->call_user_func_array($fnStringInternal, $args);
-                    };
+                    $cb = Lib::fn($fnStringInternal)->setInternal()->make();
 
                 } else {
                     $cb = $fn->getFunctionStringNonInternal();
@@ -78,7 +74,7 @@ class DefaultFuncInvoker implements FuncInvokerInterface
                 );
             }
 
-            $result = call_user_func_array($cb, $args);
+            $result = call_user_func_array($cb, $fnArgs);
         }
 
         return $result;
@@ -87,10 +83,10 @@ class DefaultFuncInvoker implements FuncInvokerInterface
     /**
      * @param callable|GenericCallable $fn
      */
-    public function callUserFuncArray($fn, array $args = [])
+    public function callUserFuncArray($fn, array $fnArgs = [])
     {
         if ( ! ($fn instanceof GenericCallable) ) {
-            $result = call_user_func_array($fn, $args);
+            $result = call_user_func_array($fn, $fnArgs);
 
         } else {
             if ( $fn->isClosure() ) {
@@ -98,7 +94,7 @@ class DefaultFuncInvoker implements FuncInvokerInterface
 
             } elseif ( $fn->isMethod() ) {
                 if ( $fn->hasMethodClass($className) ) {
-                    $cbObj = $this->newInvokeObject($fn->getMethodClass(), $args);
+                    $cbObj = $this->newInvokeObject($fn->getMethodClass(), $fnArgs);
 
                 } else {
                     $cbObj = $fn->getMethodObject();
@@ -108,7 +104,7 @@ class DefaultFuncInvoker implements FuncInvokerInterface
 
             } elseif ( $fn->isInvokable() ) {
                 if ( $fn->hasInvokableClass($className) ) {
-                    $cb = $this->newInvokeObject($className, $args);
+                    $cb = $this->newInvokeObject($className, $fnArgs);
 
                 } else {
                     $cb = $fn->getInvokableObject();
@@ -116,11 +112,7 @@ class DefaultFuncInvoker implements FuncInvokerInterface
 
             } elseif ( $fn->isFunction() ) {
                 if ( $fn->hasFunctionStringInternal($fnStringInternal) ) {
-                    $cb = static function (...$args) use ($fnStringInternal) {
-                        $theFunc = Lib::func();
-
-                        return $theFunc->call_user_func_array($fnStringInternal, $args);
-                    };
+                    $cb = Lib::fn($fnStringInternal)->setInternal()->make();
 
                 } else {
                     $cb = $fn->getFunctionStringNonInternal();
@@ -132,7 +124,7 @@ class DefaultFuncInvoker implements FuncInvokerInterface
                 );
             }
 
-            $result = call_user_func_array($cb, $args);
+            $result = call_user_func_array($cb, $fnArgs);
         }
 
         return $result;
